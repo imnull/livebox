@@ -4,24 +4,26 @@ import { LOCAL_CHANNEL } from "~/config"
 
 import { CanvasRandom, VideoPort } from '~/components'
 
-export default () => {
+export default (props: {
+    channel: string
+}) => {
+    const { channel } = props
     const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null)
     const [video, setVideo] = useState<HTMLVideoElement | null>(null)
     const [m, setM] = useState<PeerMedia | null>(null)
     const [canPlay, setCanPlay] = useState(false)
 
     useEffect(() => {
-        if(!video) {
+        if(!video || !channel) {
             return
         }
         getUserMedia().then(stream => {
             video.srcObject = stream
-            const m = new PeerMedia({ channel: LOCAL_CHANNEL })
-            m.setStream(stream)
-            m.connect()
+            const m = new PeerMedia({ channel })
+            m.push(stream)
             setM(m)
         })
-    }, [video])
+    }, [video, channel])
 
 
     return <div className="livebox live-main">
@@ -44,8 +46,7 @@ export default () => {
                 }
                 getUserMedia().then(stream => {
                     video.srcObject = stream
-                    m.setStream(stream)
-                    m.connect()
+                    m.push(stream)
                     setM(m)
                 })
             }}>Camera</button>
@@ -54,8 +55,7 @@ export default () => {
                     return
                 }
                 const stream = canvas!.captureStream()
-                m.setStream(stream)
-                m.connect()
+                m.push(stream)
                 setM(m)
             }}>Canvas</button>
         </div>

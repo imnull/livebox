@@ -2,20 +2,23 @@ import { useEffect, useState } from "react"
 import { PeerMedia, getUserMedia } from "~/libs/peer-media"
 import { LOCAL_CHANNEL } from "~/config"
 
-export default () => {
+export default (props: {
+    channel: string
+}) => {
+    const { channel = '' } = props
     const [v, setV] = useState<HTMLVideoElement | null>(null)
-    const [m, setM] = useState<PeerMedia | null>(null)
 
     useEffect(() => {
-        if (!v) {
+        if (!v || !channel) {
             return
         }
-        const m = new PeerMedia({ channel: LOCAL_CHANNEL })
+        console.log(111111, channel)
+        const m = new PeerMedia({ channel })
         m.onTrack = remoteStream => {
             v.srcObject = remoteStream
         }
-        setM(m)
-    }, [v])
+
+    }, [v, channel])
 
     return <div className="livebox live-player">
         <video
@@ -24,7 +27,7 @@ export default () => {
             ref={setV}
         />
         <div className="btns">
-         
+
         </div>
     </div>
 }

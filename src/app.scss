@@ -1,0 +1,31 @@
+body {
+    margin: 0;
+}
+
+.top-title {
+    margin: 0;
+    background-color: #333;
+    color: #eee;
+    padding: 20px 30px;
+    
+    
+}
+
+.top-menu {
+    background-color: #111;
+    color: #fff;
+    font-size: 16px;
+    display: flex;
+    flex-direction: row;
+    a {
+        display: block;
+        padding: 10px 20px;
+        color: #fff;
+        text-decoration: none;
+    }
+    
+}
+
+.top-content {
+    padding: 20px;
+}

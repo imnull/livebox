@@ -11,10 +11,6 @@ export type TSignalingAnswerMessage = {
 
 export type TSignalingDataMessage = TSignalingOfferMessage | TSignalingAnswerMessage
 
-export type TSignalingVoidMessage = {
-    type: 'ready' | 'bye' | 'call' | 'call-accept'
-}
-
 export type TSignalingCandidateMessage = {
     type: 'candidate'
     candidate?: string
@@ -24,12 +20,7 @@ export type TSignalingCandidateMessage = {
 
 
 
-type TSignalingMessage = TSignalingDataMessage | TSignalingCandidateMessage | TSignalingVoidMessage
-
-// type TSignalingData<T extends TSignalingMessage['type']>
-//     = T extends TSignalingDataMessage['type'] ? TSignalingDataMessage['data']
-//     : T extends TSignalingCandidateMessage['type'] ? TSignalingCandidateMessage['candidate']
-//     : never
+type TSignalingMessage = TSignalingDataMessage | TSignalingCandidateMessage
 
 type TSignalingCallback<T extends TSignalingMessage['type']>
     = T extends TSignalingDataMessage['type'] ? { (data: TSignalingDataMessage): void | Promise<void> }
@@ -54,12 +45,9 @@ export abstract class Messager implements TMessager {
         const fn = this.events[type]
         if (typeof fn === 'function') {
             switch (type) {
+                case 'candidate':
                 case 'answer':
                 case 'offer': {
-                    await fn(msg)
-                    break
-                }
-                case 'candidate': {
                     await fn(msg)
                     break
                 }

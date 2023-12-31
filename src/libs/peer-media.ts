@@ -1,5 +1,4 @@
-import { TreeDataNode } from 'antd'
-import { TMessager, TSignalingOfferMessage, BroadcastChannelMessager } from '~/libs/signaling'
+import { TMessager, BroadcastChannelMessager } from '~/libs/signaling'
 
 type TPeerMediaOptions = {
     channel: string
@@ -84,24 +83,27 @@ export class PeerMedia {
         })
     }
     
-    setStream(stream: MediaStream) {
-        this.stream = stream
+    // setStream(stream: MediaStream) {
+    //     this.stream = stream
+    //     stream.getTracks().forEach(track => {
+    //         this.peerConn.addTrack(track)
+    //     })
+    // }
+
+    // acceptCall() {
+    //     this.messager.emit({ type: 'call-accept' })
+    // }
+
+    // call() {
+    //     this.messager.emit({
+    //         type: 'call'
+    //     })
+    // }
+
+    async push(stream: MediaStream) {
         stream.getTracks().forEach(track => {
             this.peerConn.addTrack(track)
         })
-    }
-
-    acceptCall() {
-        this.messager.emit({ type: 'call-accept' })
-    }
-
-    call() {
-        this.messager.emit({
-            type: 'call'
-        })
-    }
-
-    async connect() {
         const offer = await this.peerConn.createOffer()
         await this.peerConn.setLocalDescription(offer)
         this.messager.emit({
