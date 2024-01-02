@@ -1,21 +1,21 @@
 import { useCallback, useEffect, useState } from "react"
-import { Messager } from "~/libs/messager"
+import { Messager, RoomClient } from "~/libs/messager"
 import { Input, Button } from 'antd'
 
 export const MessageInput = (props: {
-    messager: Messager<any>
+    messager: RoomClient
+    userInfo: { nickname: string; avatar: string; gender: string }
 }) => {
 
-    const { messager } = props
+    const { messager, userInfo } = props
 
     const [value, setValue] = useState('')
 
     const keyup = useCallback((e: KeyboardEvent) => {
         if(e.key === 'Enter') {
-            messager.send({
-                target: 'public',
-                command: 'room-user-say',
-                content: value
+            messager.say({
+                content: value,
+                ...userInfo
             })
             setValue('')
         }
@@ -33,10 +33,9 @@ export const MessageInput = (props: {
             setValue((e.target as any).value)
         }} showCount maxLength={70} style={{ resize: 'none', marginRight: 10 }} />
         <Button disabled={!value} onClick={() => {
-            messager.send({
-                target: 'public',
-                command: 'room-user-say',
-                content: value
+            messager.say({
+                content: value,
+                ...userInfo
             })
             setValue('')
         }}>Send</Button>

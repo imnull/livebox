@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { ChatMessage } from "./message"
-import { findUser } from "./utils"
 import { TRoomMessage, TRoomUser } from "~/libs/messager/type"
 import type { Messager } from "~/libs/messager"
 import { RoomUser } from "./room-user"
@@ -31,7 +30,7 @@ export const ChatArea = (props: {
     return <div className='chat-area'>
         <div className='messages' ref={setMsgdom}>{
             messages.map((m, idx) => {
-                return <ChatMessage key={idx} content={m.content} me={m.id === messager.getIdentity()} user={findUser(m.id, users)} />
+                return <ChatMessage key={idx} content={m.content} me={m.userId === messager.getIdentity()} user={m.userInfo} />
             })
         }</div>
         <div className='users'>{

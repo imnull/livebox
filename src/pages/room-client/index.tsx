@@ -11,7 +11,7 @@ export default () => {
 
     const { name } = useParams()
 
-    const [info, setInfo] = useState<{ nickname?: string; avatar?: string; gender?: string } | null>(null)
+    const [info, setInfo] = useState<{ nickname: string; avatar: string; gender: string } | null>(null)
     const [users, setUsers] = useState<TRoomUser[]>([])
     const [msgs, setMsgs] = useState<TRoomMessage[]>([])
     const [msg, setMsg] = useState<RoomClient | null>(null)
@@ -51,7 +51,7 @@ export default () => {
             return <div className='chat-room'>
                 <h1>RoomClient {name}</h1>
                 <ChatArea messager={msg} messages={msgs} users={users} />
-                <MessageInput messager={msg} />
+                <MessageInput messager={msg} userInfo={{ nickname, gender, avatar }} />
             </div>
         } else {
             return <div className='chat-room'>
@@ -68,7 +68,7 @@ export default () => {
                     </select>
                 </div>
                 <button disabled={!nickname} onClick={() => {
-                    setInfo({ nickname, gender })
+                    setInfo({ nickname, gender, avatar })
                 }}>Enter room</button>
             </div>
         }

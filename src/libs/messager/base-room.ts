@@ -34,7 +34,7 @@ export class Room extends Messager<
             }
         })
         this.on<TRoomSayCommand>('room-user-say', msg => {
-            this.messages.push({ id: msg.sender, content: msg.content })
+            this.messages.push({ userId: msg.sender, content: msg.content, userInfo: msg.userInfo })
             this.onMessagesUpdate([...this.messages])
             this.send({ target: 'public', command: 'room-update-messages', data: [...this.messages] })
         })
@@ -53,11 +53,11 @@ export class RoomClient extends Messager<
 > {
 
     enterRoom(info: {
-        nickname?: string
-        avatar?: string
-        gender?: string
-    } = {}) {
-        const { nickname = this.identity, avatar = '', gender = 'unknown'} = info
+        nickname: string
+        avatar: string
+        gender: string
+    }) {
+        const { nickname, avatar, gender } = info
         this.send({
             target: 'public',
             command: 'room-user-enter',
@@ -76,11 +76,18 @@ export class RoomClient extends Messager<
         })
     }
 
-    say(content: string) {
+    say(info: {
+        content: string
+        nickname: string
+        avatar: string
+        gender: string
+    }) {
+        const { content, nickname, avatar, gender } = info
         this.send({
             target: 'public',
             command: 'room-user-say',
-            content
+            content,
+            userInfo: { nickname, avatar, gender }
         })
     }
 
