@@ -1,9 +1,23 @@
 import { Messager } from "./base"
-import { TMessagerConfig, TRoomEnterCommand, TRoomLeaveCommand, TRoomMessage, TRoomSayCommand, TRoomUser, TRoomUpdateUsers, TRoomUpdateMessages, TMessagerCoreConfig } from "./type"
+import {
+    TMessagerConfig, TRoomEnterCommand, TRoomLeaveCommand, TRoomMessage, TRoomSayCommand,
+    TRoomUser, TRoomUpdateUsers, TRoomUpdateMessages, TMessagerCoreConfig, TRoomEnterOKCommand,
+} from "./type"
 
-export class Room extends Messager<
-    TRoomEnterCommand | TRoomSayCommand | TRoomLeaveCommand | TRoomUpdateUsers | TRoomUpdateMessages
-> {
+type TRoomRequestLive = {
+    command: 'room-request-live'
+}
+
+type TRoomResponseLive = {
+    command: 'room-response-live'
+    channel: string
+}
+
+type TRoomCommand = TRoomEnterCommand | TRoomEnterOKCommand | TRoomSayCommand
+    | TRoomLeaveCommand | TRoomUpdateUsers | TRoomUpdateMessages
+    | TRoomRequestLive | TRoomResponseLive
+
+export class Room extends Messager<TRoomCommand> {
     private readonly users: TRoomUser[]
     private readonly messages: TRoomMessage[]
 
@@ -20,8 +34,8 @@ export class Room extends Messager<
                 this.users.push({ id: msg.sender, ...msg.data })
                 this.onUsersUpdate([...this.users])
                 this.send({ target: 'public', command: 'room-update-users', data: [...this.users] })
-            } else {
                 this.send({ target: 'private', reciever: msg.sender, command: 'room-update-users', data: [...this.users] })
+            } else {
             }
             this.send({ target: 'private', reciever: msg.sender, command: 'room-update-messages', data: [...this.messages] })
         })
@@ -38,19 +52,25 @@ export class Room extends Messager<
             this.onMessagesUpdate([...this.messages])
             this.send({ target: 'public', command: 'room-update-messages', data: [...this.messages] })
         })
+        this.on<TRoomRequestLive>('room-request-live', msg => {
+            this.send({
+                target: 'private',
+                reciever: msg.sender,
+                command: 'room-response-live',
+                channel: msg.sender
+            })
+        })
     }
 
     onUsersUpdate(users: TRoomUser[]) {
-        console.log('AbstractRoom users:', users)
+        console.log('Room users:', users)
     }
     onMessagesUpdate(messages: TRoomMessage[]) {
-        console.log('AbstractRoom messages:', messages)
+        console.log('Room messages:', messages)
     }
 }
 
-export class RoomClient extends Messager<
-    TRoomEnterCommand | TRoomSayCommand | TRoomLeaveCommand | TRoomUpdateUsers | TRoomUpdateMessages
-> {
+export class RoomClient extends Messager<TRoomCommand> {
 
     enterRoom(info: {
         nickname: string
@@ -66,6 +86,27 @@ export class RoomClient extends Messager<
                 avatar,
                 gender
             }
+        })
+    }
+
+    enter() {
+        const nickname = '', avatar = '', gender = ''
+        this.send({
+            target: 'public',
+            command: 'room-user-enter',
+            data: {
+                nickname,
+                avatar,
+                gender
+            }
+        })
+    }
+
+    requestLive() {
+        console.log(9999999999, 'requestLive')
+        this.send({
+            target: 'public',
+            command: 'room-request-live',
         })
     }
 
@@ -102,9 +143,9 @@ export class RoomClient extends Messager<
     }
 
     onUsersUpdate(users: TRoomUser[]) {
-        console.log('AbstractRoomClient users:', users)
+        console.log('RoomClient users:', users)
     }
     onMessagesUpdate(messages: TRoomMessage[]) {
-        console.log('AbstractRoomClient messages:', messages)
+        console.log('RoomClient messages:', messages)
     }
 }

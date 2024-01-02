@@ -1,6 +1,7 @@
 import { Messager } from "./base"
+import { LiveRequest } from "./base-live"
 import { Room, RoomClient } from "./base-room"
-import { TMessagerConfig, TCommandExtra, TCoreMessager } from "./type"
+import { TMessagerConfig, TCommandExtra, TCoreMessager, TLiveRequestOptions } from "./type"
 
 const createMessagerCore = (namespace: string): TCoreMessager => {
     const signaling = new BroadcastChannel(namespace)
@@ -10,12 +11,17 @@ const createMessagerCore = (namespace: string): TCoreMessager => {
                 if (!e.data) {
                     return
                 }
+                console.log('=============>', namespace, e.data.command, e.data.sender, e.data.reciever)
                 cb(e.data)
             }
         },
         poseMessage(data) {
+            console.log('------------->', namespace, data.command, data.sender, data.reciever)
             signaling.postMessage(data)
-        }
+        },
+        close() {
+            signaling.close()
+        },
     }
 }
 
@@ -34,7 +40,7 @@ export class BroadcastChannelMessager<C extends TCommandExtra> extends Messager<
 
 /**
  * ### BroadcastChannelRoom
- * Impliment Room by BroadcastChannel
+ * Room implimented by BroadcastChannel
  */
 export class BroadcastChannelRoom extends Room {
     constructor(config: TMessagerConfig = {}) {
@@ -45,11 +51,23 @@ export class BroadcastChannelRoom extends Room {
 }
 
 /**
- * ### BroadcastChannelRoom
- * Impliment Room by BroadcastChannel
+ * ### BroadcastChannelRoomClient
+ * RoomClient implimented by BroadcastChannel
  */
 export class BroadcastChannelRoomClient extends RoomClient {
     constructor(config: TMessagerConfig = {}) {
+        const { namespace = '' } = config
+        const core = createMessagerCore(namespace)
+        super({ ...config, core })
+    }
+}
+
+/**
+ * ### BroadcastChannelLiveRequest
+ * LiveRequest implimented by BroadcastChannel
+ */
+export class BroadcastChannelLiveRequest extends LiveRequest {
+    constructor(config: TMessagerConfig & TLiveRequestOptions) {
         const { namespace = '' } = config
         const core = createMessagerCore(namespace)
         super({ ...config, core })

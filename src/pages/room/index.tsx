@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { BroadcastChannelRoom } from '~/libs/messager'
 import { TRoomMessage, TRoomUser } from '~/libs/messager/type'
 
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import '~/pages/chat-room.scss'
 

@@ -15,7 +15,6 @@ export default () => {
     const [users, setUsers] = useState<TRoomUser[]>([])
     const [msgs, setMsgs] = useState<TRoomMessage[]>([])
     const [msg, setMsg] = useState<RoomClient | null>(null)
-    const [value, setValue] = useState('')
 
     const [nickname, setNickname] = useState('')
     const [avatar, setAvatar] = useState('')

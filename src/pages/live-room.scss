@@ -1,0 +1,10 @@
+.live-list {
+    border: 2px solid #000;
+    .list {
+        .item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+    }
+}

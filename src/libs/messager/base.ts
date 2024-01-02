@@ -4,18 +4,20 @@ import { genId } from "./utils"
 
 export class Messager<C extends TCommandExtra = TCommandHello> {
 
-    protected readonly core: TCoreMessager
+    protected readonly core: TCoreMessager<C>
     protected readonly namespace: string
     protected readonly identity: string
+    protected fakeIdentity: string = ''
     protected readonly groups: string[]
     protected readonly blocks: string[]
     protected readonly events: EventBus
-    constructor(config: TMessagerConfig & TMessagerCoreConfig) {
+    constructor(config: TMessagerConfig & TMessagerCoreConfig<C>) {
 
         const { core, namespace = '', groups = [], blocks = [] } = config
 
         this.core = core
         this.identity = genId()
+        this.fakeIdentity = ''
         this.namespace = namespace
         this.groups = [...groups]
         this.blocks = [...blocks]
@@ -28,7 +30,7 @@ export class Messager<C extends TCommandExtra = TCommandHello> {
         this.core.useCallback(data => {
             this.triggerEvent(data)
         })
-        console.log(`Messager [${this.identity}] init:`, new Date())
+        console.log(`Messager [${this.getIdentity()}] init:`, new Date())
     }
 
     private checkMessage(message: TMessageInner) {
@@ -41,29 +43,48 @@ export class Messager<C extends TCommandExtra = TCommandHello> {
             case 'group':
                 return this.groups.includes(message.group)
             case 'private':
-                return this.identity === message.reciever
+                return this.getIdentity() === message.reciever
         }
         return false
     }
 
-    private triggerEvent(message: TMessage & C) {
-        const innerMessage: TMessageInner & C = { ...message, sender: this.identity }
-        if (!this.checkMessage(innerMessage)) {
+    private triggerEvent(message: TMessageInner & C) {
+        if (!this.checkMessage(message)) {
             return
         }
-        this.events.triggerEvent(innerMessage.command, message)
+        this.events.triggerEvent(message.command, message)
     }
 
-    getIdentity() {
+    replaceIdentity(fakeId: string = '') {
+        this.fakeIdentity = fakeId
+    }
+
+    getRawIdentity() {
         return this.identity
     }
 
+    getIdentity() {
+        if(this.fakeIdentity) {
+            return this.fakeIdentity
+        } else {
+            return this.identity
+        }
+    }
+
     on<T extends C = C>(command: T['command'], callback: (data: TMessageInner & T) => void) {
+        console.log(8888888111111, 'on', command)
         this.events.subscribe(command, callback)
     }
 
     send(msg: TMessage & C) {
-        const innerMessage: TMessageInner | C = { ...msg, sender: this.identity }
+        const innerMessage: TMessageInner & C = { ...msg, sender: this.getIdentity() }
+        console.log(9999999911111, 'send')
         this.core.poseMessage(innerMessage)
+    }
+
+    close() {
+        console.log(777777777711111, 'close')
+        this.events.dispose()
+        this.core.close()
     }
 }
