@@ -1,0 +1,124 @@
+.chat-room {
+    height: 400px;
+    .chat-area {
+        height: 100%;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: row;
+        background-color: #eee;
+        .messages {
+            overflow: auto;
+            flex: 1;
+            margin: 0px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .users {
+            border-left: 1px solid #ccc;
+            background-color: #fff;
+            width: 240px;
+        }
+    }
+    .row {
+        display: flex;
+        flex-direction: row;
+        padding: 10px;
+        .label {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+    }
+}
+
+.room-user {
+    display: flex;
+    flex-direction: row;
+    margin: 2px 2px 0px 2px;
+    padding: 2px;
+    font-size: 14px;
+    align-items: center;
+    cursor: pointer;
+
+    
+
+    &.me {
+        flex-direction: row-reverse;
+    }
+
+    .gender {
+        width: 36px;
+        height: 36px;
+        border-radius: 2px;
+        background-color: #aaa;
+        opacity: 0.2;
+        &.male {
+            background-color: #00f;
+        }
+        &.female {
+            background-color: #f00;
+        }
+    }
+    .nickname {
+        margin: 0px 5px;
+    }
+}
+
+.chat-content {
+    padding: 15px 20px;
+    margin-left: 6px;
+    margin-right: 0px;
+    width: 100%;
+    box-sizing: border-box;
+    word-break: break-all;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    &.me {
+        margin-left: 0px;
+        margin-right: 6px;
+        background-color: #e3ffac;
+        .nickname {
+            align-self: flex-end;
+        }
+    }
+    .nickname {
+        font-size: 12px;
+    }
+}
+
+.chat-message {
+    max-width: 90%;
+    margin: 5px 0;
+    padding: 5px 10px;
+    &.me {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+    }
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+
+    .user-wrapper {
+        margin-top: 5px;
+    }
+}
+
+.room-list {
+    li {
+        a {
+            margin: 5px;
+        }
+    }
+}
+
+.message-input {
+    display: flex;
+    flex-direction: row;
+    margin-top: 10px;
+}
