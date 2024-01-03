@@ -36,6 +36,7 @@ export default (props: {
 
         const client = BroadcastChannel.createLiveClient({ namespace: liveChannel })
         client.onTrack = stream => {
+            console.log(2222222, stream)
             video.srcObject = stream
         }
 

@@ -1,0 +1,19 @@
+.live-local-container {
+    width: 480px;
+    height: 360px;
+    background-color: #000;
+    color: #eee;
+    video {
+        width: 480px;
+        height: 360px;
+    }
+
+    &.mini {
+        width: 160px;
+        height: 120px;
+        video {
+            width: 160px;
+            height: 120px;
+        }
+    }
+}

@@ -3,6 +3,8 @@ import { LiveRequest } from '~/libs/messager'
 import { BroadcastChannel } from '~/libs/messager'
 import { TRoomRequestLive, TRoomRequestReady, TRoomResponseLive, TRoomResponseLiveCanPlay, TRoomResponseLivePlay } from '~/libs/messager/type'
 
+import './index.scss'
+
 export default (props: {
     channel?: string
     stream?: MediaStream | null
@@ -70,7 +72,7 @@ export default (props: {
         </div>
     }
 
-    return <div className='live-main'>
+    return <div className='live-main-container'>
         <video muted autoPlay ref={setVideo} />
     </div>
 }

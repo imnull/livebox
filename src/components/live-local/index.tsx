@@ -1,49 +1,41 @@
 import { useEffect, useState } from "react"
-import { PeerMedia, getUserMedia } from "~/libs/peer-media"
-import { LOCAL_CHANNEL } from "~/config"
 
-export default () => {
-    const [v, setV] = useState<HTMLVideoElement | null>(null)
-    const [m, setM] = useState<PeerMedia | null>(null)
-    const [ready, setReady] = useState(false)
+import './index.scss'
+
+export default (props: {
+    mini?: boolean
+    onReady?: (canvas: MediaStream) => void
+}) => {
+    const { mini = false, onReady } = props
+    const [video, setVideo] = useState<HTMLVideoElement | null>(null)
+    const [stream, setStream] = useState<MediaStream | null>(null)
+    const [error, setError] = useState('')
 
     useEffect(() => {
-        if(!v) {
+        if (!video || !stream) {
             return
         }
-        getUserMedia().then(stream => {
-            v.srcObject = stream
-            const m = new PeerMedia({ channel: LOCAL_CHANNEL })
-            m.setStream(stream)
-            setM(m)
+        video.srcObject = stream
+    }, [video, stream])
+
+    useEffect(() => {
+        if (stream && typeof onReady === 'function') {
+            onReady(stream)
+        }
+    }, [stream, onReady])
+
+    useEffect(() => {
+        navigator.mediaDevices.getUserMedia({ audio: false, video: true }).then(stream => {
+            setStream(stream)
+        }, (err: any) => {
+            console.log(1111111, err)
+            setError(String(err))
         })
-    }, [v])
+    }, [])
 
-    useEffect(() => {
-        if(!m) {
-            return
-        }
 
-    }, [m])
 
-    return <div className="live-local">
-        <video
-            autoPlay
-            ref={setV}
-            onCanPlay={() => {
-                setReady(true)
-            }}
-        />
-        <div className="btns">
-            <button disabled={!m || !ready} onClick={() => {
-                console.log(m)
-                m!.call()
-                setReady(false)
-            }}>Call</button>
-            <button disabled={!m || ready} onClick={() => {
-                setReady(false)
-                m!.dispose()
-            }}>Hang Up</button>
-        </div>
+    return <div className={`live-local-container ${mini ? 'mini' : ''}`}>
+        {error ? <span className="error">{error}</span> : <video autoPlay ref={setVideo} />}
     </div>
 }
