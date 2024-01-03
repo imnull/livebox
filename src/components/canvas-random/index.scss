@@ -1,0 +1,18 @@
+.canvas-random-container {
+    width: 480px;
+    height: 360px;
+    background-color: #000;
+    canvas {
+        width: 480px;
+        height: 360px;
+    }
+
+    &.mini {
+        width: 160px;
+        height: 120px;
+        canvas {
+            width: 160px;
+            height: 120px;
+        }
+    }
+}

@@ -1,63 +1,76 @@
-import { useEffect, useState } from "react"
-import { PeerMedia, getUserMedia } from "~/libs/peer-media"
-import { LOCAL_CHANNEL } from "~/config"
-
-import { CanvasRandom, VideoPort } from '~/components'
+import { useEffect, useState } from 'react'
+import { LiveRequest } from '~/libs/messager'
+import { BroadcastChannel } from '~/libs/messager'
+import { TRoomRequestLive, TRoomRequestReady, TRoomResponseLive, TRoomResponseLiveCanPlay, TRoomResponseLivePlay } from '~/libs/messager/type'
 
 export default (props: {
-    channel: string
+    channel?: string
+    stream?: MediaStream | null
+    update?: number
+    onCreateLive?: (info: { channel: string; sender: string; connection: LiveRequest }) => void
 }) => {
-    const { channel } = props
-    const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null)
+
+    const { channel, stream, onCreateLive, update = Date.now() } = props
     const [video, setVideo] = useState<HTMLVideoElement | null>(null)
-    const [m, setM] = useState<PeerMedia | null>(null)
-    const [canPlay, setCanPlay] = useState(false)
 
     useEffect(() => {
-        if(!video || !channel) {
+        if (!channel || !stream) {
             return
         }
-        getUserMedia().then(stream => {
-            video.srcObject = stream
-            const m = new PeerMedia({ channel })
-            m.push(stream)
-            setM(m)
-        })
-    }, [video, channel])
 
-
-    return <div className="livebox live-main">
-        <div className="screens">
-            {/* <video
-                className={`video ${canPlay ? '' : 'waiting'}`}
-                autoPlay
-                ref={setVideo}
-                onCanPlay={() => {
-                    setCanPlay(true)
-                }}
-            /> */}
-            <VideoPort onReady={setVideo} />
-            <CanvasRandom onReady={setCanvas} />
-        </div>
-        <div className="btns">
-            <button onClick={() => {
-                if(!m || !video) {
-                    return
-                }
-                getUserMedia().then(stream => {
-                    video.srcObject = stream
-                    m.push(stream)
-                    setM(m)
+        const messager = BroadcastChannel.createMessager<TRoomResponseLiveCanPlay | TRoomRequestLive | TRoomResponseLive | TRoomRequestReady | TRoomResponseLivePlay>({ namespace: channel })
+        messager.regist({
+            'room-live-canplay': msg => {
+                messager.send({
+                    target: 'private',
+                    reciever: msg.sender,
+                    command: 'room-live-play'
                 })
-            }}>Camera</button>
-            <button disabled={!m || !canvas} onClick={() => {
-                if(!m) {
-                    return
+            },
+            'room-request-live': msg => {
+                const connection = BroadcastChannel.createLive({ namespace: msg.channel })
+                connection.append(stream)
+
+                if (typeof onCreateLive === 'function') {
+                    onCreateLive({
+                        sender: msg.sender,
+                        channel: msg.channel,
+                        connection,
+                    })
                 }
-                const stream = canvas!.captureStream()
-                m.push(stream)
-                setM(m)
-            }}>Canvas</button>
+                messager.send({
+                    target: 'private',
+                    reciever: msg.sender,
+                    command: 'room-response-live',
+                })
+            }
+        })
+        messager.send({
+            target: 'public',
+            command: 'room-request-live-ready'
+        })
+
+
+        return () => {
+            messager.close()
+        }
+
+    }, [channel, stream])
+
+    useEffect(() => {
+        if (!stream || !video) {
+            return
+        }
+        video.srcObject = stream
+    }, [stream, video])
+
+    if (!channel || !stream) {
+        return <div className='live-main'>
+            <h1>No data</h1>
         </div>
+    }
+
+    return <div className='live-main'>
+        <video muted autoPlay ref={setVideo} />
     </div>
 }

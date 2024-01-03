@@ -1,13 +1,11 @@
 import { Messager } from "./base"
 import {
     TLiveRequestCommandAnswer, TLiveRequestCommandCandidate, TLiveRequestCommandOffer,
-    TLiveRequestCommandChannel, TLiveRequestCommandChannelReady,
     TMessagerConfig, TMessagerCoreConfig,
 } from "./type"
 
 export class LiveRequest extends Messager<
     TLiveRequestCommandCandidate | TLiveRequestCommandOffer | TLiveRequestCommandAnswer
-    | TLiveRequestCommandChannel | TLiveRequestCommandChannelReady
 > {
 
     private readonly peerConn: RTCPeerConnection
@@ -92,10 +90,10 @@ export class LiveRequestClient extends Messager<
     private initRTCPeerConnection() {
         const peerConn = this.peerConn
         peerConn.ontrack = e => {
-            if(e.streams && e.streams.length > 0) {
+            if (e.streams && e.streams.length > 0) {
                 const media = e.streams[0]
                 typeof this.onTrack === 'function' && this.onTrack(media)
-            } else if(e.track) {
+            } else if (e.track) {
                 const media = new MediaStream()
                 media.addTrack(e.track)
                 typeof this.onTrack === 'function' && this.onTrack(media)

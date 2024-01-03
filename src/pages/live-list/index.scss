@@ -1,0 +1,17 @@
+.live-list-container {
+    .live-panel {
+        display: flex;
+        flex-direction: row;
+        .list {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 10px;
+            .item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    }
+}

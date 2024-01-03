@@ -17,15 +17,6 @@ export default () => {
             }, 1000)
             setC('live_channel')
         })
-
-        // m.on('live', ({ data: live_channel }) => {
-        //     if(!live_channel) {
-        //         return
-        //     }
-        //     setC('live_channel')
-        //     console.log(666666, live_channel)
-        // })
-
         m.enterRoom()
     }, [])
 

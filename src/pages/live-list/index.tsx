@@ -1,88 +1,71 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { CanvasRandom } from '~/components'
-import { Room, LiveRequest } from '~/libs/messager'
-import { BroadcastChannel } from '~/libs/messager'
+import { LiveMain } from '~/components'
+import { Button } from 'antd'
 
-import '~/pages/live-room.scss'
+import './index.scss'
 
 const CHANNEL01 = 'channel01'
 
+const replaceStream = (from: MediaStream, to: MediaStream) => {
+    to.getTracks().forEach(track => {
+        to.removeTrack(track)
+    })
+    from.getTracks().forEach(track => {
+        to.addTrack(track)
+    })
+}
+
+const cloneStream = (stream: MediaStream) => {
+    const ms = new MediaStream()
+    stream.getTracks().forEach(track => {
+        ms.addTrack(track)
+    })
+    return ms
+}
+
 export default () => {
 
-    const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null)
-    const [stream01, setStream01] = useState<MediaStream | null>(null)
-    const [room01, setRoom01] = useState<Room | null>(null)
+    const [current, setCurrent] = useState(0)
+    const [s0, setS0] = useState<MediaStream | null>(null)
+    const [s1, setS1] = useState<MediaStream | null>(null)
+    const [s2, setS2] = useState<MediaStream | null>(null)
 
-    const [streamHash, setStreamHash] = useState<Record<string, LiveRequest>>({})
+    const [main, setMain] = useState(new MediaStream())
 
     useEffect(() => {
-        if (!canvas) {
+        const from = [s0, s1, s2][current]
+        if(!from) {
             return
         }
-        setStream01(canvas.captureStream())
-    }, [canvas])
+        // replaceStream(from, main)
+        setMain(cloneStream(from))
+        
+    }, [current, s0, s1, s2])
 
-    useEffect(() => {
-        if (!stream01) {
-            setRoom01(null)
-            return
-        }
-        const room01 = BroadcastChannel.createRoom({ namespace: CHANNEL01 })
+    const ss = [s0, s1, s2]
 
-        setRoom01(room01)
-
-        return () => {
-            console.log(7777777, room01)
-            room01.close()
-        }
-
-    }, [stream01])
-
-    useEffect(() => {
-        if (!room01 || !stream01) {
-            return
-        }
-
-        room01.regist({
-            'room-request-live': msg => {
-                const reciever = msg.sender
-                const channel = msg.channel
-                
-                const { [reciever]: oldSt } = streamHash
-                if (oldSt) {
-                    oldSt.close()
-                }
-
-                const newSt = BroadcastChannel.createLive({ namespace: reciever })
-                newSt.append(stream01)
-                setStreamHash({ ...streamHash, [reciever]: newSt })
-
-                room01.send({
-                    target: 'private',
-                    reciever: msg.sender,
-                    command: 'room-response-live',
-                    channel: channel
-                })
-
-            }
-        })
-    }, [stream01, room01])
-
-    useEffect(() => {
-        return () => {
-            room01 && room01.close()
-        }
-    }, [room01])
-
-
-
-    return <div className='live-list'>
+    return <div className='live-list-container'>
         <h1>LiveList</h1>
-        <div className='list'>
-            <div className='item'>
-                <CanvasRandom onReady={setCanvas} />
-                <NavLink to={`/live/${CHANNEL01}`}>Go Channel01</NavLink>
+        <div className='live-panel'>
+            <div className='list'>
+                <div className='item'>
+                    <CanvasRandom onReady={setS0} mini fillColor='yellow' />
+                    <Button size='large' style={{ margin: 5 }}  disabled={current === 0} onClick={() => setCurrent(0)}>切换</Button>
+                </div>
+                <div className='item'>
+                    <CanvasRandom onReady={setS1} mini fillColor='blue' />
+                    <Button size='large' style={{ margin: 5 }} disabled={current === 1} onClick={() => setCurrent(1)}>切换</Button>
+                </div>
+                <div className='item'>
+                    <CanvasRandom onReady={setS2} mini fillColor='red' />
+                    <Button size='large' style={{ margin: 5 }}  disabled={current === 2} onClick={() => setCurrent(2)}>切换</Button>
+                </div>
+            </div>
+            <div className='monitor'>
+                <LiveMain channel={CHANNEL01} stream={main} />
+                <NavLink target='_blank' to={`/live/${CHANNEL01}`}>Go Channel01</NavLink>
             </div>
         </div>
     </div>

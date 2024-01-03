@@ -68,21 +68,28 @@ export type TRoomMessage = { userId: string; content: string, userInfo: { nickna
 export type TRoomUpdateUsers = { command: 'room-update-users', data: TRoomUser[] }
 export type TRoomUpdateMessages = { command: 'room-update-messages', data: TRoomMessage[] }
 
+export type TRoomRequestReady = {
+    command: 'room-request-live-ready'
+}
+
 export type TRoomRequestLive = {
     command: 'room-request-live'
     channel: string
-    client: string
 }
 
 export type TRoomResponseLive = {
     command: 'room-response-live'
-    channel: string
+}
+
+export type TRoomResponseLiveCanPlay = {
+    command: 'room-live-canplay'
+}
+
+export type TRoomResponseLivePlay = {
+    command: 'room-live-play'
 }
 
 /* ### Chat room types END ### */
-
-export type TLiveRequestCommandChannel = { command: 'live-request-channel' }
-export type TLiveRequestCommandChannelReady = { command: 'live-request-channel-ready'; channel: string }
 
 export type TLiveRequestCommandCandidate = {
     command: 'live-request-candidate';

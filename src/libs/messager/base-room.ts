@@ -2,13 +2,15 @@ import { Messager } from "./base"
 import {
     TMessagerConfig, TRoomEnterCommand, TRoomLeaveCommand, TRoomMessage, TRoomSayCommand,
     TRoomUser, TRoomUpdateUsers, TRoomUpdateMessages, TMessagerCoreConfig, TRoomEnterOKCommand, 
-    TRoomRequestLive, TRoomResponseLive,
+    TRoomRequestLive, TRoomResponseLive, TRoomRequestReady,
+    TRoomResponseLivePlay, TRoomResponseLiveCanPlay,
 } from "./type"
 import { genId } from "./utils"
 
 type TRoomCommand = TRoomEnterCommand | TRoomEnterOKCommand | TRoomSayCommand
     | TRoomLeaveCommand | TRoomUpdateUsers | TRoomUpdateMessages
-    | TRoomRequestLive | TRoomResponseLive
+    | TRoomRequestLive | TRoomResponseLive | TRoomRequestReady
+    | TRoomResponseLiveCanPlay | TRoomResponseLivePlay
 
 
 // type TT = TExtraCommand<TRoomCommand, 'room-update-messages'>
@@ -53,6 +55,21 @@ export class Room extends Messager<TRoomCommand> {
         })
     }
 
+    liveReady() {
+        this.send({
+            target: 'public',
+            command: 'room-request-live-ready'
+        })
+    }
+
+    livePlay(client: string) {
+        this.send({
+            target: 'private',
+            reciever: client,
+            command: 'room-live-play'
+        })
+    }
+
     onUsersUpdate(users: TRoomUser[]) {
         console.log('Room users:', users)
     }
@@ -93,12 +110,18 @@ export class RoomClient extends Messager<TRoomCommand> {
         })
     }
 
-    requestLive(client: string) {
+    liveRequest(channel: string) {
         this.send({
             target: 'public',
             command: 'room-request-live',
-            channel: this.getIdentity(),
-            client,
+            channel,
+        })
+    }
+
+    liveCanPlay() {
+        this.send({
+            target: 'public',
+            command: 'room-live-canplay',
         })
     }
 
