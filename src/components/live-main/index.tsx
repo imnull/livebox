@@ -3,6 +3,8 @@ import { LiveRequest } from '~/libs/messager'
 import { BroadcastChannel } from '~/libs/messager'
 import { TRoomRequestLive, TRoomRequestReady, TRoomResponseLive, TRoomResponseLiveCanPlay, TRoomResponseLivePlay } from '~/libs/messager/type'
 
+import { StreamBus } from '~/components'
+
 import './index.scss'
 
 export default (props: {
@@ -13,10 +15,10 @@ export default (props: {
 }) => {
 
     const { channel, stream, onCreateLive, update = Date.now() } = props
-    const [video, setVideo] = useState<HTMLVideoElement | null>(null)
+    const [output, setOutput] = useState<MediaStream | null>(null)
 
     useEffect(() => {
-        if (!channel || !stream) {
+        if (!channel || !output) {
             return
         }
 
@@ -31,7 +33,7 @@ export default (props: {
             },
             'room-request-live': msg => {
                 const connection = BroadcastChannel.createLive({ namespace: msg.channel })
-                connection.append(stream)
+                connection.append(output)
 
                 if (typeof onCreateLive === 'function') {
                     onCreateLive({
@@ -57,22 +59,15 @@ export default (props: {
             messager.close()
         }
 
-    }, [channel, stream])
+    }, [channel, output])
 
-    useEffect(() => {
-        if (!stream || !video) {
-            return
-        }
-        video.srcObject = stream
-    }, [stream, video])
-
-    if (!channel || !stream) {
-        return <div className='live-main'>
-            <h1>No data</h1>
+    if (!channel) {
+        return <div className='live-main-container'>
+            <h1>No channel</h1>
         </div>
     }
 
     return <div className='live-main-container'>
-        <video muted autoPlay ref={setVideo} />
+        <StreamBus stream={stream} mini onReady={setOutput} />
     </div>
 }

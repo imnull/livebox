@@ -4,7 +4,7 @@ import './index.scss'
 
 export default (props: {
     mini?: boolean
-    onReady?: (canvas: MediaStream) => void
+    onReady?: (canvas: MediaStream | null) => void
 }) => {
     const { mini = false, onReady } = props
     const [video, setVideo] = useState<HTMLVideoElement | null>(null)
@@ -19,16 +19,15 @@ export default (props: {
     }, [video, stream])
 
     useEffect(() => {
-        if (stream && typeof onReady === 'function') {
-            onReady(stream)
-        }
+        typeof onReady === 'function' && onReady(stream || null)
     }, [stream, onReady])
 
     useEffect(() => {
         navigator.mediaDevices.getUserMedia({ audio: false, video: true }).then(stream => {
             setStream(stream)
+            setError('')
         }, (err: any) => {
-            console.log(1111111, err)
+            setStream(null)
             setError(String(err))
         })
     }, [])
