@@ -1,21 +1,17 @@
 import { Messager } from "./base"
 import {
     TMessagerConfig, TRoomEnterCommand, TRoomLeaveCommand, TRoomMessage, TRoomSayCommand,
-    TRoomUser, TRoomUpdateUsers, TRoomUpdateMessages, TMessagerCoreConfig, TRoomEnterOKCommand,
+    TRoomUser, TRoomUpdateUsers, TRoomUpdateMessages, TMessagerCoreConfig, TRoomEnterOKCommand, 
+    TRoomRequestLive, TRoomResponseLive,
 } from "./type"
-
-type TRoomRequestLive = {
-    command: 'room-request-live'
-}
-
-type TRoomResponseLive = {
-    command: 'room-response-live'
-    channel: string
-}
+import { genId } from "./utils"
 
 type TRoomCommand = TRoomEnterCommand | TRoomEnterOKCommand | TRoomSayCommand
     | TRoomLeaveCommand | TRoomUpdateUsers | TRoomUpdateMessages
     | TRoomRequestLive | TRoomResponseLive
+
+
+// type TT = TExtraCommand<TRoomCommand, 'room-update-messages'>
 
 export class Room extends Messager<TRoomCommand> {
     private readonly users: TRoomUser[]
@@ -28,37 +24,32 @@ export class Room extends Messager<TRoomCommand> {
         this.initRoom()
     }
     protected initRoom() {
-        this.on<TRoomEnterCommand>('room-user-enter', msg => {
-            const idx = this.users.findIndex(u => u.id === msg.sender)
-            if (idx < 0) {
-                this.users.push({ id: msg.sender, ...msg.data })
-                this.onUsersUpdate([...this.users])
-                this.send({ target: 'public', command: 'room-update-users', data: [...this.users] })
-                this.send({ target: 'private', reciever: msg.sender, command: 'room-update-users', data: [...this.users] })
-            } else {
+
+        this.regist({
+            'room-user-enter': msg => {
+                const idx = this.users.findIndex(u => u.id === msg.sender)
+                if (idx < 0) {
+                    this.users.push({ id: msg.sender, ...msg.data })
+                    this.onUsersUpdate([...this.users])
+                    this.send({ target: 'public', command: 'room-update-users', data: [...this.users] })
+                    this.send({ target: 'private', reciever: msg.sender, command: 'room-update-users', data: [...this.users] })
+                } else {
+                }
+                this.send({ target: 'private', reciever: msg.sender, command: 'room-update-messages', data: [...this.messages] })
+            },
+            'room-user-leave': msg => {
+                const idx = this.users.findIndex(u => u.id === msg.sender)
+                if (idx > -1) {
+                    this.users.splice(idx, 1)
+                    this.onUsersUpdate([...this.users])
+                    this.send({ target: 'public', command: 'room-update-users', data: [...this.users] })
+                }
+            },
+            'room-user-say': msg => {
+                this.messages.push({ userId: msg.sender, content: msg.content, userInfo: msg.userInfo })
+                this.onMessagesUpdate([...this.messages])
+                this.send({ target: 'public', command: 'room-update-messages', data: [...this.messages] })
             }
-            this.send({ target: 'private', reciever: msg.sender, command: 'room-update-messages', data: [...this.messages] })
-        })
-        this.on<TRoomLeaveCommand>('room-user-leave', msg => {
-            const idx = this.users.findIndex(u => u.id === msg.sender)
-            if (idx > -1) {
-                this.users.splice(idx, 1)
-                this.onUsersUpdate([...this.users])
-                this.send({ target: 'public', command: 'room-update-users', data: [...this.users] })
-            }
-        })
-        this.on<TRoomSayCommand>('room-user-say', msg => {
-            this.messages.push({ userId: msg.sender, content: msg.content, userInfo: msg.userInfo })
-            this.onMessagesUpdate([...this.messages])
-            this.send({ target: 'public', command: 'room-update-messages', data: [...this.messages] })
-        })
-        this.on<TRoomRequestLive>('room-request-live', msg => {
-            this.send({
-                target: 'private',
-                reciever: msg.sender,
-                command: 'room-response-live',
-                channel: msg.sender
-            })
         })
     }
 
@@ -102,11 +93,12 @@ export class RoomClient extends Messager<TRoomCommand> {
         })
     }
 
-    requestLive() {
-        console.log(9999999999, 'requestLive')
+    requestLive(client: string) {
         this.send({
             target: 'public',
             command: 'room-request-live',
+            channel: this.getIdentity(),
+            client,
         })
     }
 
@@ -134,12 +126,22 @@ export class RoomClient extends Messager<TRoomCommand> {
 
     protected init() {
         super.init()
-        this.on<TRoomUpdateUsers>('room-update-users', msg => {
-            this.onUsersUpdate(msg.data)
+
+        this.regist({
+            'room-update-users': msg => {
+                this.onUsersUpdate(msg.data)
+            },
+            'room-update-messages': msg => {
+                this.onMessagesUpdate(msg.data)
+            }
         })
-        this.on<TRoomUpdateMessages>('room-update-messages', msg => {
-            this.onMessagesUpdate(msg.data)
-        })
+
+        // this.on<TRoomUpdateUsers>('room-update-users', msg => {
+        //     this.onUsersUpdate(msg.data)
+        // })
+        // this.on<TRoomUpdateMessages>('room-update-messages', msg => {
+        //     this.onMessagesUpdate(msg.data)
+        // })
     }
 
     onUsersUpdate(users: TRoomUser[]) {

@@ -1,12 +1,14 @@
 import { useEffect } from 'react'
-import { BroadcastChannelMessager } from '~/libs/messager'
+import { BroadcastChannel } from '~/libs/messager'
 
 export default () => {
 
     useEffect(() => {
-        const msg = new BroadcastChannelMessager({ namespace: 'webrtc1' })
-        msg.on('hello', msg => {
-            console.log(11111, msg)
+        const msg = BroadcastChannel.createMessager({ namespace: 'webrtc1' })
+        msg.regist({
+            hello: msg => {
+                console.log(11111, msg)
+            }
         })
         msg.send({
             target: 'public',

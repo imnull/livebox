@@ -1,5 +1,5 @@
 import EventBus from "./event-bus"
-import { TMessagerConfig, TCommandExtra, TCommandHello, TMessage, TMessageInner, TCoreMessager, TMessagerCoreConfig } from "./type"
+import { TMessagerConfig, TCommandExtra, TCommandHello, TMessage, TMessageInner, TCoreMessager, TMessagerCoreConfig, TMessageCommandCallbackMap } from "./type"
 import { genId } from "./utils"
 
 export class Messager<C extends TCommandExtra = TCommandHello> {
@@ -55,6 +55,8 @@ export class Messager<C extends TCommandExtra = TCommandHello> {
         this.events.triggerEvent(message.command, message)
     }
 
+
+
     replaceIdentity(fakeId: string = '') {
         this.fakeIdentity = fakeId
     }
@@ -64,26 +66,33 @@ export class Messager<C extends TCommandExtra = TCommandHello> {
     }
 
     getIdentity() {
-        if(this.fakeIdentity) {
+        if (this.fakeIdentity) {
             return this.fakeIdentity
         } else {
             return this.identity
         }
     }
 
-    on<T extends C = C>(command: T['command'], callback: (data: TMessageInner & T) => void) {
-        console.log(8888888111111, 'on', command)
-        this.events.subscribe(command, callback)
+    regist(mapper: TMessageCommandCallbackMap<C, TMessageInner>) {
+        return this.events.regist(mapper)
     }
+
+    // on<T extends C = C>(command: T['command'], callback: (data: TMessageInner & T) => void) {
+    //     console.log(8888888111111, 'on', command)
+    //     this.events.subscribe(command, callback)
+    // }
+
+    // on(command: C['command'], callback: (data: TExtraCommand<C, typeof command>) => void) {
+    //     console.log(8888888111111, 'on', command)
+    //     this.events.subscribe(command, callback)
+    // }
 
     send(msg: TMessage & C) {
         const innerMessage: TMessageInner & C = { ...msg, sender: this.getIdentity() }
-        console.log(9999999911111, 'send')
         this.core.poseMessage(innerMessage)
     }
 
     close() {
-        console.log(777777777711111, 'close')
         this.events.dispose()
         this.core.close()
     }

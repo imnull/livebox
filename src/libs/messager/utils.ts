@@ -18,3 +18,10 @@ export const genId = () => {
 //     }
 //     return msg.sender && isString(msg.sender) && msg.target && isString(msg.target) && msg.command && isString(msg.command)
 // }
+
+// const m = <T extends Messager>(maker: TCoreMaker, cls: new (config: TMessagerConfig & TMessagerCoreConfig) => T) => {
+//     return (config: TMessagerConfig) => {
+//         return new cls({ ...config, core: maker(config) })
+//     }
+// }
+

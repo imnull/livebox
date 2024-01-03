@@ -1,25 +1,21 @@
 import { Messager } from "./base"
-import { TLiveRequestCommandAnswer, TLiveRequestCommandCandidate, TLiveRequestCommandOffer, TLiveRequestOptions, TMessagerConfig, TMessagerCoreConfig } from "./type"
+import {
+    TLiveRequestCommandAnswer, TLiveRequestCommandCandidate, TLiveRequestCommandOffer,
+    TLiveRequestCommandChannel, TLiveRequestCommandChannelReady,
+    TMessagerConfig, TMessagerCoreConfig,
+} from "./type"
 
 export class LiveRequest extends Messager<
     TLiveRequestCommandCandidate | TLiveRequestCommandOffer | TLiveRequestCommandAnswer
+    | TLiveRequestCommandChannel | TLiveRequestCommandChannelReady
 > {
 
-    private readonly stream: MediaStream
     private readonly peerConn: RTCPeerConnection
-    private readonly reciever: string
 
-    constructor(config: TMessagerConfig & TMessagerCoreConfig & TLiveRequestOptions) {
+    constructor(config: TMessagerConfig & TMessagerCoreConfig) {
         super(config)
-
-        const { stream, reciever } = config
-
-        this.stream = stream
-        this.reciever = reciever
         this.peerConn = new RTCPeerConnection()
-
         this.initRTCPeerConnection()
-
     }
 
     private initRTCPeerConnection() {
@@ -32,40 +28,25 @@ export class LiveRequest extends Messager<
                 _candidate = { candidate, sdpMid, sdpMLineIndex }
             }
             this.send({
-                target: 'private',
-                reciever: this.reciever,
+                target: 'public',
                 command: 'live-request-candidate',
                 candidate: _candidate
             })
         }
 
-        // this.on<TLiveRequestCommandReady>('live-request-ready', msg => {
-
-        // })
-
-        // this.on<TLiveRequestCommandStart>('live-request-start', msg => {
-
-        // })
-
-        this.on<TLiveRequestCommandCandidate>('live-request-candidate', msg => {
-            if (!msg.candidate) {
-                this.peerConn.addIceCandidate()
-            } else {
-                this.peerConn.addIceCandidate(msg.candidate)
-            }
+        this.regist({
+            'live-request-candidate': msg => {
+                console.log(99999999, msg)
+                if (!msg.candidate) {
+                    this.peerConn.addIceCandidate()
+                } else {
+                    this.peerConn.addIceCandidate(msg.candidate)
+                }
+            },
+            'live-request-answer': msg => {
+                peerConn.setRemoteDescription(msg.answer)
+            },
         })
-
-        this.on<TLiveRequestCommandOffer>('live-request-offer', msg => {
-            this.answer(msg.offer)
-        })
-
-        this.on<TLiveRequestCommandAnswer>('live-request-answer', msg => {
-            peerConn.setRemoteDescription(msg.answer)
-        })
-    }
-
-    public getReciever() {
-        return this.reciever
     }
 
     public close() {
@@ -73,36 +54,22 @@ export class LiveRequest extends Messager<
         this.peerConn.close()
     }
 
-    public async play() {
-        this.stream.getTracks().forEach(track => {
-            this.peerConn.addTrack(track)
-        })
-        await this.offer()
-    }
-
     private async offer() {
         const offer = await this.peerConn.createOffer()
         const { sdp, type } = offer
         await this.peerConn.setLocalDescription(offer)
         this.send({
-            target: 'private',
-            reciever: this.reciever,
+            target: 'public',
             command: 'live-request-offer',
             offer: { sdp, type }
         })
     }
 
-    private async answer(offer: RTCSessionDescriptionInit) {
-        await this.peerConn.setRemoteDescription(offer)
-        const answer = await this.peerConn.createAnswer()
-        const { sdp, type } = answer
-        await this.peerConn.setLocalDescription(answer)
-        this.send({
-            target: 'private',
-            reciever: this.reciever,
-            command: 'live-request-answer',
-            answer: { sdp, type }
+    async append(stream: MediaStream) {
+        stream.getTracks().forEach(track => {
+            this.peerConn.addTrack(track)
         })
+        await this.offer()
     }
 }
 
@@ -111,56 +78,42 @@ export class LiveRequestClient extends Messager<
 > {
 
     private readonly peerConn: RTCPeerConnection
-    private readonly reciever: string
 
-    constructor(config: TMessagerConfig & TMessagerCoreConfig & TLiveRequestOptions) {
+    constructor(config: TMessagerConfig & TMessagerCoreConfig) {
         super(config)
-
-        const { reciever } = config
-
-        this.reciever = reciever
         this.peerConn = new RTCPeerConnection()
-
         this.initRTCPeerConnection()
+    }
 
+    onTrack(stream: MediaStream) {
+        console.log('LiveRequestClient onTrack:', stream)
     }
 
     private initRTCPeerConnection() {
         const peerConn = this.peerConn
-
-        peerConn.onicecandidate = e => {
-            let _candidate: TLiveRequestCommandCandidate['candidate'] | null = null
-            if (e.candidate) {
-                const { candidate, sdpMid, sdpMLineIndex } = e.candidate
-                _candidate = { candidate, sdpMid, sdpMLineIndex }
+        peerConn.ontrack = e => {
+            if(e.streams && e.streams.length > 0) {
+                const media = e.streams[0]
+                typeof this.onTrack === 'function' && this.onTrack(media)
+            } else if(e.track) {
+                const media = new MediaStream()
+                media.addTrack(e.track)
+                typeof this.onTrack === 'function' && this.onTrack(media)
             }
-            this.send({
-                target: 'private',
-                reciever: this.reciever,
-                command: 'live-request-candidate',
-                candidate: _candidate
-            })
         }
 
-        this.on<TLiveRequestCommandCandidate>('live-request-candidate', msg => {
-            if (!msg.candidate) {
-                this.peerConn.addIceCandidate()
-            } else {
-                this.peerConn.addIceCandidate(msg.candidate)
-            }
+        this.regist({
+            'live-request-candidate': msg => {
+                if (!msg.candidate) {
+                    this.peerConn.addIceCandidate()
+                } else {
+                    this.peerConn.addIceCandidate(msg.candidate)
+                }
+            },
+            'live-request-offer': msg => {
+                this.answer(msg.offer)
+            },
         })
-
-        this.on<TLiveRequestCommandOffer>('live-request-offer', msg => {
-            this.answer(msg.offer)
-        })
-
-        this.on<TLiveRequestCommandAnswer>('live-request-answer', msg => {
-            peerConn.setRemoteDescription(msg.answer)
-        })
-    }
-
-    public getReciever() {
-        return this.reciever
     }
 
     public close() {
@@ -168,27 +121,13 @@ export class LiveRequestClient extends Messager<
         this.peerConn.close()
     }
 
-
-    // private async offer() {
-    //     const offer = await this.peerConn.createOffer()
-    //     const { sdp, type } = offer
-    //     await this.peerConn.setLocalDescription(offer)
-    //     this.send({
-    //         target: 'private',
-    //         reciever: this.reciever,
-    //         command: 'live-request-offer',
-    //         offer: { sdp, type }
-    //     })
-    // }
-
     private async answer(offer: RTCSessionDescriptionInit) {
         await this.peerConn.setRemoteDescription(offer)
         const answer = await this.peerConn.createAnswer()
         const { sdp, type } = answer
         await this.peerConn.setLocalDescription(answer)
         this.send({
-            target: 'private',
-            reciever: this.reciever,
+            target: 'public',
             command: 'live-request-answer',
             answer: { sdp, type }
         })

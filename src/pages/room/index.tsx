@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BroadcastChannelRoom } from '~/libs/messager'
+import { BroadcastChannel } from '~/libs/messager'
 import { TRoomMessage, TRoomUser } from '~/libs/messager/type'
 
 import { useParams } from 'react-router-dom'
@@ -13,7 +13,7 @@ export default () => {
     const { name = '' } = useParams()
 
     useEffect(() => {
-        const msg = new BroadcastChannelRoom({ namespace: name })
+        const msg = BroadcastChannel.createRoom({ namespace: name })
         msg.onUsersUpdate = setUsers
         msg.onMessagesUpdate = setMsgs
     }, [])

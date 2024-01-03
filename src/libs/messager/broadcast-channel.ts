@@ -1,9 +1,14 @@
 import { Messager } from "./base"
-import { LiveRequest } from "./base-live"
-import { Room, RoomClient } from "./base-room"
-import { TMessagerConfig, TCommandExtra, TCoreMessager, TLiveRequestOptions } from "./type"
+import type { LiveRequest, LiveRequestClient } from "./base-live"
+import type { Room, RoomClient } from "./base-room"
+import { TMessagerConfig, TCommandExtra, TCoreMessager } from "./type"
+import { generator } from "./generator"
 
-const createMessagerCore = (namespace: string): TCoreMessager => {
+const makeCore = (config: TMessagerConfig): TCoreMessager => {
+    const { namespace = '' } = config
+    if (!namespace) {
+        throw 'Need namespace'
+    }
     const signaling = new BroadcastChannel(namespace)
     return {
         useCallback(cb) {
@@ -11,12 +16,12 @@ const createMessagerCore = (namespace: string): TCoreMessager => {
                 if (!e.data) {
                     return
                 }
-                console.log('=============>', namespace, e.data.command, e.data.sender, e.data.reciever)
+                // console.log(`[I]${namespace}${'<'.repeat(12)}`, e.data)
                 cb(e.data)
             }
         },
         poseMessage(data) {
-            console.log('------------->', namespace, data.command, data.sender, data.reciever)
+            // console.log(`[O]${namespace}${'>'.repeat(12)}`, data)
             signaling.postMessage(data)
         },
         close() {
@@ -30,46 +35,10 @@ const createMessagerCore = (namespace: string): TCoreMessager => {
  * Impliment Messager by BroadcastChannel
  */
 export class BroadcastChannelMessager<C extends TCommandExtra> extends Messager<C> {
-
     constructor(config: TMessagerConfig = {}) {
-        const { namespace = '' } = config
-        const core = createMessagerCore(namespace)
-        super({ ...config, core })
+        super({ ...config, core: makeCore(config) })
     }
 }
 
-/**
- * ### BroadcastChannelRoom
- * Room implimented by BroadcastChannel
- */
-export class BroadcastChannelRoom extends Room {
-    constructor(config: TMessagerConfig = {}) {
-        const { namespace = '' } = config
-        const core = createMessagerCore(namespace)
-        super({ ...config, core })
-    }
-}
 
-/**
- * ### BroadcastChannelRoomClient
- * RoomClient implimented by BroadcastChannel
- */
-export class BroadcastChannelRoomClient extends RoomClient {
-    constructor(config: TMessagerConfig = {}) {
-        const { namespace = '' } = config
-        const core = createMessagerCore(namespace)
-        super({ ...config, core })
-    }
-}
-
-/**
- * ### BroadcastChannelLiveRequest
- * LiveRequest implimented by BroadcastChannel
- */
-export class BroadcastChannelLiveRequest extends LiveRequest {
-    constructor(config: TMessagerConfig & TLiveRequestOptions) {
-        const { namespace = '' } = config
-        const core = createMessagerCore(namespace)
-        super({ ...config, core })
-    }
-}
+export default generator(makeCore)

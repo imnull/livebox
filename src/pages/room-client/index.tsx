@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
-import { BroadcastChannelRoomClient, RoomClient } from '~/libs/messager'
+import { BroadcastChannel, RoomClient } from '~/libs/messager'
 import { TRoomMessage, TRoomUser } from '~/libs/messager/type'
 
 import { ChatArea, MessageInput } from '~/components'
@@ -21,7 +21,7 @@ export default () => {
     const [gender, setGender] = useState('unknown')
 
     useEffect(() => {
-        const msg = new BroadcastChannelRoomClient({ namespace: name })
+        const msg = BroadcastChannel.createRoomClient({ namespace: name })
         setMsg(msg)
 
         const unload = () => {
