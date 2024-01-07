@@ -1,8 +1,5 @@
-import { Messager } from "./base"
-import type { LiveRequest, LiveRequestClient } from "./base-live"
-import type { Room, RoomClient } from "./base-room"
-import { TMessagerConfig, TCommandExtra, TCoreMessager } from "./type"
-import { generator } from "./generator"
+import { TMessagerConfig, TCoreMessager } from "./type"
+import { generator, generatorPromise } from "./generator"
 
 const makeCore = (config: TMessagerConfig): TCoreMessager => {
     const { namespace = '' } = config
@@ -30,15 +27,40 @@ const makeCore = (config: TMessagerConfig): TCoreMessager => {
     }
 }
 
-/**
- * ### BroadcastChannelMessager
- * Impliment Messager by BroadcastChannel
- */
-export class BroadcastChannelMessager<C extends TCommandExtra> extends Messager<C> {
-    constructor(config: TMessagerConfig = {}) {
-        super({ ...config, core: makeCore(config) })
+const createCore = (signaling: BroadcastChannel): TCoreMessager => {
+    return {
+        useCallback(cb) {
+            signaling.onmessage = (e) => {
+                if (!e.data) {
+                    return
+                }
+                // console.log(`[I]${namespace}${'<'.repeat(12)}`, e.data)
+                cb(e.data)
+            }
+        },
+        poseMessage(data) {
+            // console.log(`[O]${namespace}${'>'.repeat(12)}`, data)
+            signaling.postMessage(data)
+        },
+        close() {
+            signaling.close()
+        },
     }
 }
 
+const makeCorePromise = (config: TMessagerConfig): Promise<TCoreMessager> => new Promise((resolve, reject) => {
+    const { prefix = '', namespace = '' } = config
+    if (!namespace) {
+        throw 'Need namespace'
+    }
+    let uri = namespace
+    if (prefix) {
+        uri = `${prefix}/${uri}`
+    }
+    const signaling = new BroadcastChannel(namespace)
 
-export default generator(makeCore)
+    Promise.resolve(createCore(signaling)).then(resolve, reject)
+})
+
+// export default generator(makeCore)
+export default generatorPromise(makeCorePromise)

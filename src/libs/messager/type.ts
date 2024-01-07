@@ -23,12 +23,14 @@ export type TCoreMessager<C extends TCommandExtra = TCommandHello> = {
 }
 
 export type TCoreMaker<T extends TMessagerConfig = TMessagerConfig, C extends TCommandExtra = TCommandHello> = (config: T) => TCoreMessager<C>
+export type TCoreMakerAsync<T extends TMessagerConfig = TMessagerConfig, C extends TCommandExtra = TCommandHello> = (config: T) => Promise<TCoreMessager<C>>
 
 export type TMessagerCoreConfig<C extends TCommandExtra = TCommandHello> = {
     core: TCoreMessager<C>
 }
 
 export type TMessagerConfig = {
+    prefix?: string
     namespace?: string
     groups?: string[]
     blocks?: string[]

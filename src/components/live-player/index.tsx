@@ -18,32 +18,32 @@ export default (props: {
         if (!liveChannel || !video || !channel) {
             return
         }
-        const messager = BroadcastChannel.createMessager<TRoomRequestReady | TRoomResponseLivePlay | TRoomRequestLive>({ namespace: channel })
-        messager.regist({
-            'room-request-live-ready': () => {
-                setLiveChannel(`live_${genId()}`)
-            },
-            'room-live-play': msg => {
-                video.play()
+        BroadcastChannel.createMessager<
+            TRoomRequestReady | TRoomResponseLivePlay | TRoomRequestLive
+        >({ namespace: channel }).then(async messager => {
+
+            messager.regist({
+                'room-request-live-ready': () => {
+                    setLiveChannel(`live_${genId()}`)
+                },
+                'room-live-play': msg => {
+                    video.play()
+                }
+            })
+
+            const client = await BroadcastChannel.createLiveClient({ namespace: liveChannel })
+            client.onTrack = stream => {
+                console.log(2222222, stream)
+                video.srcObject = stream
             }
+
+            messager.send({
+                target: 'public',
+                command: 'room-request-live',
+                channel: liveChannel,
+            })
         })
-
-        messager.send({
-            target: 'public',
-            command: 'room-request-live',
-            channel: liveChannel,
-        })
-
-        const client = BroadcastChannel.createLiveClient({ namespace: liveChannel })
-        client.onTrack = stream => {
-            console.log(2222222, stream)
-            video.srcObject = stream
-        }
-
-        return () => {
-            client.close()
-            messager.close()
-        }
+        
     }, [liveChannel, video, channel])
 
     if (!channel) {

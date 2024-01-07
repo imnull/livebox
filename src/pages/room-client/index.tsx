@@ -21,18 +21,13 @@ export default () => {
     const [gender, setGender] = useState('unknown')
 
     useEffect(() => {
-        const msg = BroadcastChannel.createRoomClient({ namespace: name })
-        setMsg(msg)
-
-        const unload = () => {
-            msg.leaveRoom()
-        }
-        window.addEventListener('unload', unload)
-
-        return () => {
-            // msg.leaveRoom()
-        }
-
+        BroadcastChannel.createRoomClient({ namespace: name }).then(msg => {
+            setMsg(msg)
+            const unload = () => {
+                msg.leaveRoom()
+            }
+            window.addEventListener('unload', unload)
+        })
     }, [])
 
     useEffect(() => {

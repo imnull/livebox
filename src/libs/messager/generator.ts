@@ -1,4 +1,4 @@
-import { TCommandExtra, TCommandHello, TCoreMaker, TMessagerConfig } from "./type"
+import { TCommandExtra, TCommandHello, TCoreMaker, TCoreMakerAsync, TMessagerConfig } from "./type"
 
 import { Messager } from "./base"
 import { LiveRequest, LiveRequestClient } from "./base-live"
@@ -20,6 +20,34 @@ export const generator = (maker: TCoreMaker) => {
         },
         createLiveClient: (conf: TMessagerConfig) => {
             return new LiveRequestClient({ ...conf, core: maker(conf) })
+        },
+    }
+}
+
+// type TGeneratorResult = ReturnType<typeof generator>
+// type TGeneratorResultAsync = { [key in keyof TGeneratorResult]: Promise<TGeneratorResult[key]> }
+
+export const generatorPromise = (maker: TCoreMakerAsync) => {
+    return {
+        createMessager: async <C extends TCommandExtra = TCommandHello>(conf: TMessagerConfig) => {
+            const core = await maker(conf)
+            return new Messager<C>({ ...conf, core })
+        },
+        createRoom: async (conf: TMessagerConfig) => {
+            const core = await maker(conf)
+            return new Room({ ...conf, core })
+        },
+        createRoomClient: async (conf: TMessagerConfig) => {
+            const core = await maker(conf)
+            return new RoomClient({ ...conf, core })
+        },
+        createLive: async (conf: TMessagerConfig) => {
+            const core = await maker(conf)
+            return new LiveRequest({ ...conf, core })
+        },
+        createLiveClient: async (conf: TMessagerConfig) => {
+            const core = await maker(conf)
+            return new LiveRequestClient({ ...conf, core })
         },
     }
 }

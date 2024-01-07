@@ -22,42 +22,40 @@ export default (props: {
             return
         }
 
-        const messager = BroadcastChannel.createMessager<TRoomResponseLiveCanPlay | TRoomRequestLive | TRoomResponseLive | TRoomRequestReady | TRoomResponseLivePlay>({ namespace: channel })
-        messager.regist({
-            'room-live-canplay': msg => {
-                messager.send({
-                    target: 'private',
-                    reciever: msg.sender,
-                    command: 'room-live-play'
-                })
-            },
-            'room-request-live': msg => {
-                const connection = BroadcastChannel.createLive({ namespace: msg.channel })
-                connection.append(output)
-
-                if (typeof onCreateLive === 'function') {
-                    onCreateLive({
-                        sender: msg.sender,
-                        channel: msg.channel,
-                        connection,
+        BroadcastChannel.createMessager<
+            TRoomResponseLiveCanPlay | TRoomRequestLive | TRoomResponseLive | TRoomRequestReady | TRoomResponseLivePlay
+        >({ namespace: channel }).then(messager => {
+            messager.regist({
+                'room-live-canplay': msg => {
+                    messager.send({
+                        target: 'private',
+                        reciever: msg.sender,
+                        command: 'room-live-play'
+                    })
+                },
+                'room-request-live': msg => {
+                    BroadcastChannel.createLive({ namespace: msg.channel }).then(connection => {
+                        connection.append(output)
+                        if (typeof onCreateLive === 'function') {
+                            onCreateLive({
+                                sender: msg.sender,
+                                channel: msg.channel,
+                                connection,
+                            })
+                        }
+                        messager.send({
+                            target: 'private',
+                            reciever: msg.sender,
+                            command: 'room-response-live',
+                        })
                     })
                 }
-                messager.send({
-                    target: 'private',
-                    reciever: msg.sender,
-                    command: 'room-response-live',
-                })
-            }
+            })
+            messager.send({
+                target: 'public',
+                command: 'room-request-live-ready'
+            })
         })
-        messager.send({
-            target: 'public',
-            command: 'room-request-live-ready'
-        })
-
-
-        return () => {
-            messager.close()
-        }
 
     }, [channel, output])
 
