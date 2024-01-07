@@ -1,3 +1,4 @@
+import { RTCPeerConnectionConfig } from "./index"
 import { Messager } from "./base"
 import {
     TLiveRequestCommandAnswer, TLiveRequestCommandCandidate, TLiveRequestCommandOffer,
@@ -12,7 +13,7 @@ export class LiveRequest extends Messager<
 
     constructor(config: TMessagerConfig & TMessagerCoreConfig) {
         super(config)
-        this.peerConn = new RTCPeerConnection()
+        this.peerConn = new RTCPeerConnection(RTCPeerConnectionConfig)
         this.initRTCPeerConnection()
     }
 
@@ -78,7 +79,7 @@ export class LiveRequestClient extends Messager<
 
     constructor(config: TMessagerConfig & TMessagerCoreConfig) {
         super(config)
-        this.peerConn = new RTCPeerConnection()
+        this.peerConn = new RTCPeerConnection(RTCPeerConnectionConfig)
         this.initRTCPeerConnection()
     }
 
