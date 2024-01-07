@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { BroadcastChannel } from '~/libs/messager'
+import { MSG } from '~/libs/messager'
 import { genId } from "~/utils"
 
 import './index.scss'
@@ -18,9 +18,9 @@ export default (props: {
         if (!liveChannel || !video || !channel) {
             return
         }
-        BroadcastChannel.createMessager<
+        MSG.createMessager<
             TRoomRequestReady | TRoomResponseLivePlay | TRoomRequestLive
-        >({ namespace: channel }).then(async messager => {
+        >({ namespace: channel, uri: 'ws://localhost:3000/livebox/channel' }).then(async messager => {
 
             messager.regist({
                 'room-request-live-ready': () => {
@@ -31,9 +31,8 @@ export default (props: {
                 }
             })
 
-            const client = await BroadcastChannel.createLiveClient({ namespace: liveChannel })
+            const client = await MSG.createLiveClient({ namespace: liveChannel, uri: 'ws://localhost:3000/livebox/channel' })
             client.onTrack = stream => {
-                console.log(2222222, stream)
                 video.srcObject = stream
             }
 

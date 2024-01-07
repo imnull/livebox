@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { LiveRequest } from '~/libs/messager'
-import { BroadcastChannel } from '~/libs/messager'
+import { MSG } from '~/libs/messager'
 import { TRoomRequestLive, TRoomRequestReady, TRoomResponseLive, TRoomResponseLiveCanPlay, TRoomResponseLivePlay } from '~/libs/messager/type'
 
 import { StreamBus } from '~/components'
@@ -22,9 +22,9 @@ export default (props: {
             return
         }
 
-        BroadcastChannel.createMessager<
+        MSG.createMessager<
             TRoomResponseLiveCanPlay | TRoomRequestLive | TRoomResponseLive | TRoomRequestReady | TRoomResponseLivePlay
-        >({ namespace: channel }).then(messager => {
+        >({ namespace: channel, uri: 'ws://localhost:3000/livebox/channel' }).then(messager => {
             messager.regist({
                 'room-live-canplay': msg => {
                     messager.send({
@@ -34,7 +34,7 @@ export default (props: {
                     })
                 },
                 'room-request-live': msg => {
-                    BroadcastChannel.createLive({ namespace: msg.channel }).then(connection => {
+                    MSG.createLive({ namespace: msg.channel, uri: 'ws://localhost:3000/livebox/channel' }).then(connection => {
                         connection.append(output)
                         if (typeof onCreateLive === 'function') {
                             onCreateLive({

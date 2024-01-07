@@ -1,6 +1,5 @@
 import './base.scss'
 
-export { default as LiveRemote } from '~/components/live-remote'
 export { default as LivePlayer } from '~/components/live-player'
 export { default as LiveMain } from '~/components/live-main'
 export { default as VideoPort } from '~/components/video-port'

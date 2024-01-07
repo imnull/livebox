@@ -30,7 +30,7 @@ export type TMessagerCoreConfig<C extends TCommandExtra = TCommandHello> = {
 }
 
 export type TMessagerConfig = {
-    prefix?: string
+    uri?: string
     namespace?: string
     groups?: string[]
     blocks?: string[]

@@ -33,16 +33,15 @@ export class LiveRequest extends Messager<
         }
 
         this.regist({
-            'live-request-candidate': msg => {
-                console.log(99999999, msg)
+            'live-request-candidate': async msg => {
                 if (!msg.candidate) {
-                    this.peerConn.addIceCandidate()
+                    await this.peerConn.addIceCandidate()
                 } else {
-                    this.peerConn.addIceCandidate(msg.candidate)
+                    await this.peerConn.addIceCandidate(msg.candidate)
                 }
             },
-            'live-request-answer': msg => {
-                peerConn.setRemoteDescription(msg.answer)
+            'live-request-answer': async msg => {
+                await peerConn.setRemoteDescription(msg.answer)
             },
         })
     }
@@ -101,15 +100,15 @@ export class LiveRequestClient extends Messager<
         }
 
         this.regist({
-            'live-request-candidate': msg => {
+            'live-request-candidate': async msg => {
                 if (!msg.candidate) {
-                    this.peerConn.addIceCandidate()
+                    await this.peerConn.addIceCandidate()
                 } else {
-                    this.peerConn.addIceCandidate(msg.candidate)
+                    await this.peerConn.addIceCandidate(msg.candidate)
                 }
             },
-            'live-request-offer': msg => {
-                this.answer(msg.offer)
+            'live-request-offer': async msg => {
+                await this.answer(msg.offer)
             },
         })
     }

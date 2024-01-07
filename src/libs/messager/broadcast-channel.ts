@@ -49,13 +49,9 @@ const createCore = (signaling: BroadcastChannel): TCoreMessager => {
 }
 
 const makeCorePromise = (config: TMessagerConfig): Promise<TCoreMessager> => new Promise((resolve, reject) => {
-    const { prefix = '', namespace = '' } = config
+    const { namespace = '' } = config
     if (!namespace) {
         throw 'Need namespace'
-    }
-    let uri = namespace
-    if (prefix) {
-        uri = `${prefix}/${uri}`
     }
     const signaling = new BroadcastChannel(namespace)
 
