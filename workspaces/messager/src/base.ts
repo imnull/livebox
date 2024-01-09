@@ -10,6 +10,9 @@ export class Messager<C extends TCommandExtra = never> {
     protected readonly groups: string[]
     protected readonly blocks: string[]
     protected readonly events: EventBus
+
+    public onMessage?: (msg: TMessageInner & C) => void
+
     constructor(config: TMessagerConfig & TMessagerCoreConfig) {
 
         const { core, namespace = '', groups = [], blocks = [] } = config
@@ -50,6 +53,9 @@ export class Messager<C extends TCommandExtra = never> {
         if (!this.checkMessage(message)) {
             return
         }
+        if(typeof this.onMessage === 'function') {
+            this.onMessage(message)
+        }
         this.events.triggerEvent(message.command, message)
     }
 
@@ -71,6 +77,10 @@ export class Messager<C extends TCommandExtra = never> {
 
     regist(mapper: TMessageCommandCallbackMap<C, TMessageInner>) {
         return this.events.regist(mapper)
+    }
+
+    emit(message: TMessageInner & C) {
+        this.triggerEvent(message)
     }
 
     send(msg: TMessage & C) {
