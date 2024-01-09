@@ -1,6 +1,4 @@
 import Home from '~/pages/home';
-import Main from '~/pages/main';
-import Show from '~/pages/show';
 import RoomList from '~/pages/room-list';
 import Room from '~/pages/room';
 import RoomClient from '~/pages/room-client';
