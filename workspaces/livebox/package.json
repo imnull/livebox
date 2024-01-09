@@ -29,6 +29,7 @@
     "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
+    "@imnull/messager": "*",
     "@reduxjs/toolkit": "^2.0.1",
     "antd": "^5.12.5",
     "react": "^18.2.0",

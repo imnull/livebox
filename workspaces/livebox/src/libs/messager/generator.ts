@@ -1,25 +1,28 @@
-import { TCommandExtra, TCommandHello, TCoreMaker, TCoreMakerAsync, TMessagerConfig } from "./type"
+import {
+    Messager,
+    TCommandExtra, TCoreMaker, TCoreMakerAsync, TMessagerConfig,
+    messagerGenerator, messagerGeneratorAsync,
+} from "@imnull/messager"
 
-import { Messager } from "./base"
 import { LiveRequest, LiveRequestClient } from "./base-live"
 import { Room, RoomClient } from "./base-room"
 
 export const generator = (maker: TCoreMaker) => {
     return {
-        createMessager: <C extends TCommandExtra = TCommandHello>(conf: TMessagerConfig) => {
-            return new Messager<C>({ ...conf, core: maker(conf) })
+        createMessager: <C extends TCommandExtra = never>(conf: TMessagerConfig) => {
+            return messagerGenerator(Messager<C>, maker)(conf)
         },
         createRoom: (conf: TMessagerConfig) => {
-            return new Room({ ...conf, core: maker(conf) })
+            return messagerGenerator(Room, maker)(conf)
         },
         createRoomClient: (conf: TMessagerConfig) => {
-            return new RoomClient({ ...conf, core: maker(conf) })
+            return messagerGenerator(RoomClient, maker)(conf)
         },
         createLive: (conf: TMessagerConfig) => {
-            return new LiveRequest({ ...conf, core: maker(conf) })
+            return messagerGenerator(LiveRequest, maker)(conf)
         },
         createLiveClient: (conf: TMessagerConfig) => {
-            return new LiveRequestClient({ ...conf, core: maker(conf) })
+            return messagerGenerator(LiveRequestClient, maker)(conf)
         },
     }
 }
@@ -29,25 +32,20 @@ export const generator = (maker: TCoreMaker) => {
 
 export const generatorPromise = (maker: TCoreMakerAsync) => {
     return {
-        createMessager: async <C extends TCommandExtra = TCommandHello>(conf: TMessagerConfig) => {
-            const core = await maker(conf)
-            return new Messager<C>({ ...conf, core })
+        createMessager:  <C extends TCommandExtra = never>(conf: TMessagerConfig) => {
+            return messagerGeneratorAsync(Messager<C>, maker)(conf)
         },
         createRoom: async (conf: TMessagerConfig) => {
-            const core = await maker(conf)
-            return new Room({ ...conf, core })
+            return messagerGeneratorAsync(Room, maker)(conf)
         },
         createRoomClient: async (conf: TMessagerConfig) => {
-            const core = await maker(conf)
-            return new RoomClient({ ...conf, core })
+            return messagerGeneratorAsync(RoomClient, maker)(conf)
         },
         createLive: async (conf: TMessagerConfig) => {
-            const core = await maker(conf)
-            return new LiveRequest({ ...conf, core })
+            return messagerGeneratorAsync(LiveRequest, maker)(conf)
         },
         createLiveClient: async (conf: TMessagerConfig) => {
-            const core = await maker(conf)
-            return new LiveRequestClient({ ...conf, core })
+            return messagerGeneratorAsync(LiveRequestClient, maker)(conf)
         },
     }
 }

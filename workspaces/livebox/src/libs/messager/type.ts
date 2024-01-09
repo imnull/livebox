@@ -1,43 +1,4 @@
-export type TMessage = ({
-    target: 'public'
-} | {
-    target: 'group'
-    group: string
-} | {
-    target: 'private'
-    reciever: string
-})
-
-export type TCommandHello = {
-    command: 'hello'
-}
-
-export type TMessageInner = {
-    sender: string
-} & TMessage
-
-export type TCoreMessager<C extends TCommandExtra = TCommandHello> = {
-    useCallback: (callback: (data: TMessageInner & C) => void) => void
-    poseMessage: (data: TMessage & C) => void
-    close: () => void
-}
-
-export type TCoreMaker<T extends TMessagerConfig = TMessagerConfig, C extends TCommandExtra = TCommandHello> = (config: T) => TCoreMessager<C>
-export type TCoreMakerAsync<T extends TMessagerConfig = TMessagerConfig, C extends TCommandExtra = TCommandHello> = (config: T) => Promise<TCoreMessager<C>>
-
-export type TMessagerCoreConfig<C extends TCommandExtra = TCommandHello> = {
-    core: TCoreMessager<C>
-}
-
-export type TMessagerConfig = {
-    uri?: string
-    namespace?: string
-    groups?: string[]
-    blocks?: string[]
-}
-
-export type TCommandExtra = { command: string; data?: any }
-
+import { TMessage } from '@imnull/messager'
 
 /* ### Chat room types ### */
 
@@ -113,20 +74,3 @@ export type TExtraCommand<M extends { command: string }, C extends M['command']>
 export type TMessageCommandNames<T extends { command: string }> = T extends { command: infer C } ? C : never
 export type TMessageCommandMap<T extends { command: string }, E extends TMessage = TMessage> = { [key in T['command']]: TExtraCommand<T, key> & E }
 export type TMessageCommandCallbackMap<T extends { command: string }, E extends TMessage = TMessage> = { [key in T['command']]?: (msg: TExtraCommand<T, key> & E) => void }
-
-// type TTTTT<TT, T> = T extends TT ? T : never
-// export type TMessageEventCallback<M extends { command: string }> = (command: M['command'], callback: TMessageCommandCallbackMap<M>[typeof command]) => void
-
-
-
-// // const m: TMessageMap<TRoomEnterCommand | TRoomEnterOKCommand | TLiveRequestCommandAnswer, TMessageInner>
-// // type TCommandNames = TMessageCommandNames<TLiveRequestCommandAnswer | TRoomEnterOKCommand>
-
-
-// type TTT = TMessageEventCallback<TRoomEnterCommand | TRoomEnterOKCommand | TLiveRequestCommandAnswer>
-
-// const f: TTT
-
-// f('live-request-answer', msg => {
-    
-// })

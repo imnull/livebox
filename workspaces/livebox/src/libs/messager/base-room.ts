@@ -1,19 +1,16 @@
-import { Messager } from "./base"
+import { Messager, TMessagerConfig, TMessagerCoreConfig } from "@imnull/messager"
 import {
-    TMessagerConfig, TRoomEnterCommand, TRoomLeaveCommand, TRoomMessage, TRoomSayCommand,
-    TRoomUser, TRoomUpdateUsers, TRoomUpdateMessages, TMessagerCoreConfig, TRoomEnterOKCommand, 
+    TRoomEnterCommand, TRoomLeaveCommand, TRoomMessage, TRoomSayCommand,
+    TRoomUser, TRoomUpdateUsers, TRoomUpdateMessages, TRoomEnterOKCommand, 
     TRoomRequestLive, TRoomResponseLive, TRoomRequestReady,
     TRoomResponseLivePlay, TRoomResponseLiveCanPlay,
 } from "./type"
-import { genId } from "./utils"
 
 type TRoomCommand = TRoomEnterCommand | TRoomEnterOKCommand | TRoomSayCommand
     | TRoomLeaveCommand | TRoomUpdateUsers | TRoomUpdateMessages
     | TRoomRequestLive | TRoomResponseLive | TRoomRequestReady
     | TRoomResponseLiveCanPlay | TRoomResponseLivePlay
 
-
-// type TT = TExtraCommand<TRoomCommand, 'room-update-messages'>
 
 export class Room extends Messager<TRoomCommand> {
     private readonly users: TRoomUser[]
@@ -158,13 +155,6 @@ export class RoomClient extends Messager<TRoomCommand> {
                 this.onMessagesUpdate(msg.data)
             }
         })
-
-        // this.on<TRoomUpdateUsers>('room-update-users', msg => {
-        //     this.onUsersUpdate(msg.data)
-        // })
-        // this.on<TRoomUpdateMessages>('room-update-messages', msg => {
-        //     this.onMessagesUpdate(msg.data)
-        // })
     }
 
     onUsersUpdate(users: TRoomUser[]) {

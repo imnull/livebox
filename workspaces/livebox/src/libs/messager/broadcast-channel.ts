@@ -1,4 +1,4 @@
-import { TMessagerConfig, TCoreMessager } from "./type"
+import { TMessagerConfig, TCoreMessager } from "@imnull/messager"
 import { generator, generatorPromise } from "./generator"
 
 const makeCore = (config: TMessagerConfig): TCoreMessager => {

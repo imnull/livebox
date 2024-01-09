@@ -1,9 +1,6 @@
+import { Messager, TMessagerConfig, TMessagerCoreConfig } from "@imnull/messager"
+import { TLiveRequestCommandAnswer, TLiveRequestCommandCandidate, TLiveRequestCommandOffer } from "./type"
 import { RTCPeerConnectionConfig } from "./index"
-import { Messager } from "./base"
-import {
-    TLiveRequestCommandAnswer, TLiveRequestCommandCandidate, TLiveRequestCommandOffer,
-    TMessagerConfig, TMessagerCoreConfig,
-} from "./type"
 
 export class LiveRequest extends Messager<
     TLiveRequestCommandCandidate | TLiveRequestCommandOffer | TLiveRequestCommandAnswer

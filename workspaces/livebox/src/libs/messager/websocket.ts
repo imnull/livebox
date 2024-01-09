@@ -1,6 +1,5 @@
-import { TMessagerConfig, TCoreMessager } from "./type"
-import { generator, generatorPromise } from "./generator"
-import { genId } from "./utils"
+import { TMessagerConfig, TCoreMessager, genId } from "@imnull/messager"
+import { generatorPromise } from "./generator"
 
 const createCore = (signaling: WebSocket, namespace: string, socketid: string): TCoreMessager => {
     return {
