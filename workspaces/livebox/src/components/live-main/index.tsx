@@ -24,7 +24,7 @@ export default (props: {
 
         MSG.createMessager<
             TRoomResponseLiveCanPlay | TRoomRequestLive | TRoomResponseLive | TRoomRequestReady | TRoomResponseLivePlay
-        >({ namespace: channel, uri: 'ws://localhost:3000/livebox/channel' }).then(messager => {
+        >({ namespace: channel, uri: 'ws://localhost:3213/livebox' }).then(messager => {
             messager.regist({
                 'room-live-canplay': msg => {
                     messager.send({
@@ -34,7 +34,7 @@ export default (props: {
                     })
                 },
                 'room-request-live': msg => {
-                    MSG.createLive({ namespace: msg.channel, uri: 'ws://localhost:3000/livebox/channel' }).then(connection => {
+                    MSG.createLive({ namespace: msg.channel, uri: 'ws://localhost:3213/livebox' }).then(connection => {
                         connection.append(output)
                         if (typeof onCreateLive === 'function') {
                             onCreateLive({

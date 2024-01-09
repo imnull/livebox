@@ -20,7 +20,7 @@ export default (props: {
         }
         MSG.createMessager<
             TRoomRequestReady | TRoomResponseLivePlay | TRoomRequestLive
-        >({ namespace: channel, uri: 'ws://localhost:3000/livebox/channel' }).then(async messager => {
+        >({ namespace: channel, uri: 'ws://localhost:3213/livebox' }).then(async messager => {
 
             messager.regist({
                 'room-request-live-ready': () => {
@@ -31,7 +31,7 @@ export default (props: {
                 }
             })
 
-            const client = await MSG.createLiveClient({ namespace: liveChannel, uri: 'ws://localhost:3000/livebox/channel' })
+            const client = await MSG.createLiveClient({ namespace: liveChannel, uri: 'ws://localhost:3213/livebox' })
             client.onTrack = stream => {
                 video.srcObject = stream
             }

@@ -1,0 +1,24 @@
+{
+  "name": "@imnull/message-bridge",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/server/start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@imnull/messager": "*",
+    "koa": "^2.15.0",
+    "koa-router": "^12.0.1",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.13.12",
+    "@types/koa-router": "^7.4.8",
+    "ts-node": "^10.9.2"
+  }
+}

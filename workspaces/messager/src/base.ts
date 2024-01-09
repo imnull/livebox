@@ -1,8 +1,8 @@
 import EventBus from "./event-bus"
-import { TMessagerConfig, TCommandExtra, TMessage, TMessageInner, TCoreMessager, TMessagerCoreConfig, TMessageCommandCallbackMap } from "./type"
+import { TMessagerConfig, TCommandExtra, TMessage, TMessageInner, TCoreMessager, TMessagerCoreConfig, TMessageCommandCallbackMap, TMessager } from "./type"
 import { genId } from "./utils"
 
-export class Messager<C extends TCommandExtra = never> { 
+export class Messager<C extends TCommandExtra = never> implements TMessager<C> {
 
     protected readonly core: TCoreMessager
     protected readonly namespace: string
@@ -30,7 +30,10 @@ export class Messager<C extends TCommandExtra = never> {
     protected init() {
         this.core.useCallback(data => {
             this.triggerEvent(data)
-        })
+        }, this.identity)
+        if(typeof this.core.onReady === 'function') {
+            this.core.onReady(this)
+        }
         // console.log(`Messager [${this.getIdentity()}] init:`, new Date())
     }
 
@@ -53,7 +56,7 @@ export class Messager<C extends TCommandExtra = never> {
         if (!this.checkMessage(message)) {
             return
         }
-        if(typeof this.onMessage === 'function') {
+        if (typeof this.onMessage === 'function') {
             this.onMessage(message)
         }
         this.events.triggerEvent(message.command, message)
@@ -61,6 +64,10 @@ export class Messager<C extends TCommandExtra = never> {
 
     getIdentity() {
         return this.identity
+    }
+    
+    getNamespace() {
+        return this.namespace
     }
 
     joinGroup(...groups: string[]) {
@@ -79,17 +86,18 @@ export class Messager<C extends TCommandExtra = never> {
         return this.events.regist(mapper)
     }
 
-    emit(message: TMessageInner & C) {
-        this.triggerEvent(message)
+    emit(message: TMessage & C) {
+        const innerMessage: TMessageInner & C = { ...message, sender: this.getIdentity() }
+        this.triggerEvent(innerMessage)
     }
 
     send(msg: TMessage & C) {
         const innerMessage: TMessageInner & C = { ...msg, sender: this.getIdentity() }
-        this.core.poseMessage(innerMessage)
+        this.core.poseMessage(innerMessage, this.identity)
     }
 
     close() {
         this.events.dispose()
-        this.core.close()
+        this.core.close(this.identity)
     }
 }

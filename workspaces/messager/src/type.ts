@@ -1,3 +1,14 @@
+export type TMessager<C extends TCommandExtra = never> = {
+    getIdentity(): string
+    getNamespace(): string
+    joinGroup(...groups: string[]): void
+    blockSender(...senders: string[]): void
+    regist(mapper: TMessageCommandCallbackMap<C, TMessageInner>): void
+    emit(message: TMessage & C): void
+    send(msg: TMessage & C): void
+    close(): void
+}
+
 export type TMessage = ({
     target: 'public'
 } | {
@@ -16,10 +27,11 @@ export type TMessageInner = {
     sender: string
 } & TMessage
 
-export type TCoreMessager= {
-    useCallback: (callback: (data: any) => void) => void
-    poseMessage: (data: any) => void
-    close: () => void
+export type TCoreMessager = {
+    useCallback: (callback: (data: any) => void, sender: string) => void
+    poseMessage: (data: any, sender: string) => void
+    close: (sender: string) => void
+    onReady?: <C extends TCommandExtra = never>(messager: TMessager<C>) => void
 }
 
 export type TCoreMaker<T extends TMessagerConfig = TMessagerConfig> = (config: T) => TCoreMessager
