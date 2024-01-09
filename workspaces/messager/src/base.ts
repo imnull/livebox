@@ -1,5 +1,5 @@
 import EventBus from "./event-bus"
-import { TMessagerConfig, TCommandExtra, TMessage, TMessageInner, TCoreMessager, TMessagerCoreConfig, TMessageCommandCallbackMap, TMessager, TMergeCommand } from "./type"
+import { TMessagerConfig, TCommandExtra, TMessage, TMessageInner, TCoreMessager, TMessagerCoreConfig, TMessageCommandCallbackMap, TMessager, TMergeCommand, TMessageCommandMap, TExtraCommand, TCommandMap, TCommandHello } from "./type"
 import { genId } from "./utils"
 
 const isCommand = (v: any): v is { command: string } => {
@@ -95,6 +95,13 @@ export class Messager<C extends TCommandExtra = null> implements TMessager<C> {
 
     regist(mapper: TMessageCommandCallbackMap<C, TMessageInner>) {
         return this.events.regist(mapper)
+    }
+
+    on<K extends keyof TCommandMap<C>>(command: K, callback: (msg: TCommandMap<C>[K] & TMessageInner) => void): void {
+        this.events.subscribe(command, callback)
+    }
+    off<K extends keyof TCommandMap<C>>(command: K, callback: any): void {
+        this.events.remove(command, callback)
     }
 
     emit(message: TMergeCommand<TMessage, C>) {

@@ -1,20 +1,31 @@
 import { genId } from "./utils"
 
+type TKey = string | number | symbol
+
 class EventBus {
-    private readonly events: Record<string, { (...args: any[]): void | Promise<void> }[]>
+    private readonly events: Record<TKey, { (...args: any[]): void | Promise<void> }[]>
     private readonly id: string
     constructor() {
         this.id = genId()
         this.events = {}
     }
-    subscribe(name: string, callback: (...args: any[]) => void | Promise<void>) {
+    subscribe(name: TKey, callback: (...args: any[]) => void | Promise<void>) {
         if (!Array.isArray(this.events[name])) {
             this.events[name] = []
         }
         this.events[name].push(callback)
         // return { name, callback }
     }
-    async triggerEvent(name: string, ...params: any[]) {
+    remove(name: TKey, callback: any) {
+        const callbacks = this.events[name]
+        if(Array.isArray(callbacks)) {
+            const idx = callbacks.indexOf(callback)
+            if(idx > -1) {
+                callbacks.splice(idx, 1)
+            }
+        }   
+    }
+    async triggerEvent(name: TKey, ...params: any[]) {
         const callbacks = this.events[name]
         if (Array.isArray(callbacks)) {
             for (let i = 0; i < callbacks.length; i++) {
