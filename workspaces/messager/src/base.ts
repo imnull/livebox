@@ -1,8 +1,12 @@
 import EventBus from "./event-bus"
-import { TMessagerConfig, TCommandExtra, TMessage, TMessageInner, TCoreMessager, TMessagerCoreConfig, TMessageCommandCallbackMap, TMessager } from "./type"
+import { TMessagerConfig, TCommandExtra, TMessage, TMessageInner, TCoreMessager, TMessagerCoreConfig, TMessageCommandCallbackMap, TMessager, TMergeCommand } from "./type"
 import { genId } from "./utils"
 
-export class Messager<C extends TCommandExtra = never> implements TMessager<C> {
+const isCommand = (v: any): v is { command: string } => {
+    return v && v.command && typeof v.command === 'string'
+}
+
+export class Messager<C extends TCommandExtra = null> implements TMessager<C> {
 
     protected readonly core: TCoreMessager
     protected readonly namespace: string
@@ -11,7 +15,7 @@ export class Messager<C extends TCommandExtra = never> implements TMessager<C> {
     protected readonly blocks: string[]
     protected readonly events: EventBus
 
-    public onMessage?: (msg: TMessageInner & C) => void
+    public onMessage?: (msg: TMergeCommand<TMessageInner, C>) => void
 
     constructor(config: TMessagerConfig & TMessagerCoreConfig) {
 
@@ -37,7 +41,7 @@ export class Messager<C extends TCommandExtra = never> implements TMessager<C> {
         // console.log(`Messager [${this.getIdentity()}] init:`, new Date())
     }
 
-    private checkMessage(message: TMessageInner) {
+    private checkMessage(message: TMergeCommand<TMessageInner, C>) {
         if (!message.sender || this.blocks.includes(message.sender)) {
             return false
         }
@@ -52,7 +56,10 @@ export class Messager<C extends TCommandExtra = never> implements TMessager<C> {
         return false
     }
 
-    private triggerEvent(message: TMessageInner & C) {
+    private triggerEvent(message: TMergeCommand<TMessageInner, C>) {
+        if(!isCommand(message)) {
+            return
+        }
         if (!this.checkMessage(message)) {
             return
         }
@@ -60,6 +67,10 @@ export class Messager<C extends TCommandExtra = never> implements TMessager<C> {
             this.onMessage(message)
         }
         this.events.triggerEvent(message.command, message)
+    }
+
+    private buildInnerMessage(msg: TMergeCommand<TMessage, C>) {
+        return { ...msg, sender: this.getIdentity() } as TMergeCommand<TMessageInner, C>
     }
 
     getIdentity() {
@@ -86,13 +97,13 @@ export class Messager<C extends TCommandExtra = never> implements TMessager<C> {
         return this.events.regist(mapper)
     }
 
-    emit(message: TMessage & C) {
-        const innerMessage: TMessageInner & C = { ...message, sender: this.getIdentity() }
+    emit(message: TMergeCommand<TMessage, C>) {
+        const innerMessage = this.buildInnerMessage(message)
         this.triggerEvent(innerMessage)
     }
 
-    send(msg: TMessage & C) {
-        const innerMessage: TMessageInner & C = { ...msg, sender: this.getIdentity() }
+    send(message: TMergeCommand<TMessage, C>) {
+        const innerMessage = this.buildInnerMessage(message)
         this.core.poseMessage(innerMessage, this.identity)
     }
 

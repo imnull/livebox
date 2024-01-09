@@ -1,16 +1,16 @@
-import { TCommandExtra, TCoreMaker, TCoreMakerAsync, TCoreMessager, TMessagerConfig, TMessagerCoreConfig } from "./type"
+import { TCommandExtra, TCoreMaker, TCoreMakerAsync, TCoreMessager, TMessager, TMessagerConfig, TMessagerCoreConfig } from "./type"
 
 import { Messager } from "./base"
 
 
-export const messagerGenerator = <G extends TMessagerConfig = TMessagerConfig, C extends TCommandExtra = never, T extends Messager<C> = Messager<C>>(C: new (config: G & TMessagerCoreConfig) => T, maker: TCoreMaker<G>) => {
+export const messagerGenerator = <G extends TMessagerConfig = TMessagerConfig, C extends TCommandExtra = null, T extends TMessager<C> = TMessager<C>>(C: new (config: G & TMessagerCoreConfig) => T, maker: TCoreMaker<G>) => {
     return (config: G) => {
         const core = maker(config)
         return new C({ ...config, core })
     }
 }
 
-export const messagerGeneratorAsync = <G extends TMessagerConfig = TMessagerConfig, C extends TCommandExtra = never, T extends Messager<C> = Messager<C>>(C: new (config: G & TMessagerCoreConfig) => T, maker: TCoreMakerAsync<G>) => {
+export const messagerGeneratorAsync = <G extends TMessagerConfig = TMessagerConfig, C extends TCommandExtra = null, T extends TMessager<C> = TMessager<C>>(C: new (config: G & TMessagerCoreConfig) => T, maker: TCoreMakerAsync<G>) => {
     return async (config: G) => {
         const core = await maker(config)
         return new C({ ...config, core })
@@ -42,7 +42,7 @@ const makeCore = (config: TMessagerConfig): TCoreMessager => {
 }
 const makeCorePromise = (config: TMessagerConfig): Promise<TCoreMessager> => Promise.resolve(makeCore(config))
 
-export const createMessagerBroadcastChannel = <C extends TCommandExtra = never>(config: TMessagerConfig) => messagerGenerator(Messager<C>, makeCore)(config)
-export const createMessagerBroadcastChannelAsync = <C extends TCommandExtra = never>(config: TMessagerConfig) => messagerGeneratorAsync(Messager<C>, makeCorePromise)(config)
+export const createMessagerBroadcastChannel = <C extends TCommandExtra = null>(config: TMessagerConfig) => messagerGenerator(Messager<C>, makeCore)(config)
+export const createMessagerBroadcastChannelAsync = <C extends TCommandExtra = null>(config: TMessagerConfig) => messagerGeneratorAsync(Messager<C>, makeCorePromise)(config)
 
 

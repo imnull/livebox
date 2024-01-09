@@ -2,11 +2,11 @@ import { Messager, messagerGenerator, TCoreMaker, TMessage, TMessager, TMessager
 import type { WebSocket } from 'ws'
 
 class MessageCluster {
-    private readonly mapper: Record<string, TMessager<any>[]>
+    private readonly mapper: Record<string, TMessager[]>
     constructor() {
         this.mapper = {}
     }
-    regist(msg: TMessager<any>) {
+    regist(msg: TMessager) {
         const ns = msg.getNamespace()
         if(!Array.isArray(this.mapper[ns])) {
             this.mapper[ns] = []

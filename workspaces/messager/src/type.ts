@@ -1,12 +1,17 @@
-export type TMessager<C extends TCommandExtra = never> = {
+export type TMergeCommand<A extends TMessage, B extends TCommandExtra = null> = B extends null ? A : (A & B)
+
+export type TCommandExtra = { command: string } | null
+
+export type TMessager<C extends TCommandExtra = null> = {
     getIdentity(): string
     getNamespace(): string
     joinGroup(...groups: string[]): void
     blockSender(...senders: string[]): void
     regist(mapper: TMessageCommandCallbackMap<C, TMessageInner>): void
-    emit(message: TMessage & C): void
-    send(msg: TMessage & C): void
+    emit(message: TMergeCommand<TMessage, C>): void
+    send(msg: TMergeCommand<TMessage, C>): void
     close(): void
+    onMessage?(message: TMergeCommand<TMessageInner, C>): void
 }
 
 export type TMessage = ({
@@ -48,12 +53,11 @@ export type TMessagerConfig = {
     blocks?: string[]
 }
 
-export type TCommandExtra = { command: string }
 
 export type TExtraCommand<M extends { command: string }, C extends M['command']> = M extends { command: C } ? M : never
 // type TC = TExtraCommand<TRoomEnterCommand | TRoomEnterOKCommand, 'room-user-enter'>
 // type TC2 = TExtraCommand<TRoomEnterCommand | TRoomEnterOKCommand, 'room-user-enter-ok'>
 
-export type TMessageCommandNames<T extends { command: string }> = T extends { command: infer C } ? C : never
-export type TMessageCommandMap<T extends { command: string }, E extends TMessage = TMessage> = { [key in T['command']]: TExtraCommand<T, key> & E }
-export type TMessageCommandCallbackMap<T extends { command: string }, E extends TMessage = TMessage> = { [key in T['command']]?: (msg: TExtraCommand<T, key> & E) => void }
+// export type TMessageCommandNames<T extends { command: string }> = T extends { command: infer C } ? C : never
+export type TMessageCommandMap<T extends TCommandExtra, E extends TMessage = TMessage> = T extends { command: string } ? { [key in T['command']]: TExtraCommand<T, key> & E } : {}
+export type TMessageCommandCallbackMap<T extends TCommandExtra, E extends TMessage = TMessage> = T extends { command: string } ? { [key in T['command']]?: (msg: TExtraCommand<T, key> & E) => void } : {}
