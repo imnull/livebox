@@ -10,12 +10,11 @@ export type TMessager<C extends TCommandExtra = null> = {
     joinGroup(...groups: string[]): void
     blockSender(...senders: string[]): void
     regist(mapper: TMessageCommandCallbackMap<C, TMessageInner>): void
+    unregist(mapper: TMessageCommandCallbackMap<C, TMessageInner>): void
     emit(message: TMergeCommand<TMessage, C>): void
     send(msg: TMergeCommand<TMessage, C>): void
     close(): void
     onMessage?(message: TMergeCommand<TMessageInner, C>): void
-    on<K extends keyof TCommandMap<C>>(command: K, callback: (msg: TCommandMap<C>[K] & TMessageInner) => void): void
-    off<K extends keyof TCommandMap<C>>(command: K, callback: any): void
 }
 
 export type TMessage = ({
@@ -91,4 +90,30 @@ export type TMessageCommandCallbackMap<T extends TCommandExtra, E extends TMessa
 
 // cb('a', o => {
 //     o.type == ''
+// })
+
+// type TIsNever<T> = [T] extends [never] ? true : false
+
+
+// type TRecordNames<A extends { command: string }> = keyof A
+// type TRemoveName<A, T> = A extends T ? never : A
+// type TCleanCommand<A extends { command: string }> = { [key in TRemoveName<TRecordNames<A>, 'command'>]: A[key] }
+
+// type TMerge<A extends { command: string }, B extends { command: string }> = (TCleanCommand<A> & TCleanCommand<B>) & { command: A['command'] | B['command'] }
+// type TCommandMap2<C extends { command: string }> = { [key in C['command']]: C extends { command: key } ? C : never }
+
+// type TCMD = TMerge<{ command: 'a', a: 1, aa: 2 }, { command: 'b', b: 2 }>
+
+// const cmd: TCMD
+
+// const map: TCommandMap2<{ command: 'a', a: 1, aa: 2 } | { command: 'b', b: 2 }>
+
+// type TCb<C extends { command: string }> = (cmd: C['command'], cb: (msg: C extends { command: typeof cmd } ? C : never) => void) => void
+
+// const cb: TCb<{ command: 'a', a: 1, aa: 2 } | { command: 'b', b: 2 }>
+
+// cb('a', msg => {
+//     if(msg.command === 'a') {
+//         msg.
+//     }
 // })

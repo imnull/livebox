@@ -53,6 +53,13 @@ class EventBus {
             }
         })
     }
+    unregist(mapper: { [key: string]: undefined | ((...args: any[]) => void) }) {
+        Object.entries(mapper).forEach(([key, val]) => {
+            if (typeof val === 'function') {
+                this.remove(key, val)
+            }
+        })
+    }
 }
 
 export default EventBus

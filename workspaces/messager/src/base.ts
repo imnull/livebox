@@ -96,12 +96,8 @@ export class Messager<C extends TCommandExtra = null> implements TMessager<C> {
     regist(mapper: TMessageCommandCallbackMap<C, TMessageInner>) {
         return this.events.regist(mapper)
     }
-
-    on<K extends keyof TCommandMap<C>>(command: K, callback: (msg: TCommandMap<C>[K] & TMessageInner) => void): void {
-        this.events.subscribe(command, callback)
-    }
-    off<K extends keyof TCommandMap<C>>(command: K, callback: any): void {
-        this.events.remove(command, callback)
+    unregist(mapper: TMessageCommandCallbackMap<C, TMessageInner>) {
+        return this.events.unregist(mapper)
     }
 
     emit(message: TMergeCommand<TMessage, C>) {
