@@ -3,3 +3,7 @@ node_modules
 package-lock.json
 yarn.lock
 dist
+
+rstp-server
+
+config.json

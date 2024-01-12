@@ -8,11 +8,7 @@ export { BroadcastChannel, WS, BroadcastChannel as MSG }
 
 export const RTCPeerConnectionConfig = {
     iceServers: [
-        // {
-        //     urls: 'turn:127.0.0.1:3478',
-        //     username: 'username',
-        //     credential: 'password',
-        // },
+        ,
         // {
         //     urls: [
         //         // "stun.l.google.com:19302",

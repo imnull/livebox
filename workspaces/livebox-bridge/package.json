@@ -1,11 +1,12 @@
 {
-  "name": "@imnull/message-bridge",
+  "name": "livebox-bridge",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node src/server/start"
+    "start": "ts-node src/start",
+    "build": "tsc src/start.ts --outDir dist -d --module commonjs --target es5 --esModuleInterop"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +20,7 @@
   "devDependencies": {
     "@types/koa": "^2.13.12",
     "@types/koa-router": "^7.4.8",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   }
 }

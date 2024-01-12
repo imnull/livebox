@@ -7,6 +7,17 @@ type TAnimater = {
     stop: (cb?: { (): void }) => void
 }
 
+// const readBase64 = (file: Blob) => new Promise<string>((resolve, reject) => {
+//     const reader = new FileReader()
+//     reader.onload = () => {
+//         resolve(reader.result as string)
+//     }
+//     reader.onerror = err => {
+//         reject(err)
+//     }
+//     reader.readAsDataURL(file)
+// })
+
 const createAnimater = (cb: () => void): TAnimater => {
     let status = 0
 
@@ -100,6 +111,7 @@ export default (props: {
     const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null)
     const [video, setVideo] = useState<HTMLVideoElement | null>(null)
     const [ani, setAni] = useState<TAnimater | null>(null)
+    // const [recorder, setRecorder] = useState<MediaRecorder | null>(null)
 
     useEffect(() => {
         if (!canvas) {
@@ -151,6 +163,82 @@ export default (props: {
             ani.stop()
         }
     }, [ani])
+
+    // useEffect(() => {
+    //     console.log({ stream })
+
+    //     if(!stream) {
+    //         return
+    //     }
+
+    //     const recorder = new MediaRecorder(stream, {
+    //         // audioBitsPerSecond: 128000,
+    //         // videoBitsPerSecond: 2500000,
+    //         mimeType: 'video/webm;codecs=h264',
+    //         // mimeType: 'video/webm',
+    //     })
+
+    //     setRecorder(recorder)
+
+    //     return () => {
+    //         recorder.stop()
+    //     }
+
+    // }, [stream])
+
+    // useEffect(() => {
+    //     if(!recorder) {
+    //         return
+    //     }
+
+    //     const ws = new WebSocket('ws://localhost:3001/rtmp')
+    //     let id = 0, start = 0
+    //     recorder.addEventListener('dataavailable', async (ev: BlobEvent) => {
+    //         const { data, timeStamp, timecode } = ev
+    //         const base64 = await readBase64(data)
+    //         const order = id++
+    //         const startTime = start
+    //         const duration = timeStamp - start
+    //         const msg = { order, startTime, duration, data: base64, timeStamp, timecode, size: data.size }
+    //         start = timeStamp
+    //         ws.send(data)
+
+    //         // const msg = {
+    //         //     data: data.stream
+    //         // }
+    //         console.log(2222222, ev, msg)
+    //     })
+
+    //     // recorder.start(500)
+
+    //     return () => {
+    //         ws.close()
+    //     }
+
+    // }, [recorder])
+
+
+    // useEffect(() => {
+    //     console.log(111111, { pusher, stream })
+    //     if (!stream || !pusher) {
+    //         return
+    //     }
+    //     console.log(111111, pusher)
+
+    //     const recorder = new MediaRecorder(stream, {
+    //         audioBitsPerSecond: 128000,
+    //         videoBitsPerSecond: 2500000,
+    //         mimeType: 'video/webm;codecs=h264'
+    //     })
+    //     recorder.addEventListener('dataavailable', (ev: BlobEvent) => {
+    //         pusher.send(ev.data)
+    //         console.log(2222222, ev.data, pusher)
+    //     })
+    //     recorder.start(3000)
+    //     return () => {
+    //         // recorder.stop()
+    //     }
+    // }, [stream, pusher])
 
 
     return <div className={`stream-bus-container ${mini ? 'mini' : ''}`}>
