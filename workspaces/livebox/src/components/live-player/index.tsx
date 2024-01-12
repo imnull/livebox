@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { MSG } from '~/libs/messager'
 import { genId } from "~/utils"
+import config from '~/config'
 
 import './index.scss'
 import { TRoomRequestLive, TRoomRequestReady, TRoomResponseLivePlay } from "~/libs/messager/type"
@@ -20,7 +21,7 @@ export default (props: {
         }
         MSG.createMessager<
             TRoomRequestReady | TRoomResponseLivePlay | TRoomRequestLive
-        >({ namespace: channel, uri: 'ws://localhost:3213/livebox' }).then(async messager => {
+        >({ namespace: channel, uri: config.WS_URL }).then(async messager => {
 
             messager.regist({
                 'room-request-live-ready': () => {
@@ -31,7 +32,7 @@ export default (props: {
                 }
             })
 
-            const client = await MSG.createLiveClient({ namespace: liveChannel, uri: 'ws://localhost:3213/livebox' })
+            const client = await MSG.createLiveClient({ namespace: liveChannel, uri: config.WS_URL })
             client.onTrack = stream => {
                 video.srcObject = stream
             }

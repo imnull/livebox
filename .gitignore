@@ -7,3 +7,4 @@ dist
 rstp-server
 
 config.json
+ice-servers.json
