@@ -12,5 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "node-turn": "^0.0.6"
+  },
+  "devDependencies": {
+    "pm2": "^5.3.0"
   }
 }
