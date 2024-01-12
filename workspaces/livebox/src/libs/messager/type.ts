@@ -1,5 +1,3 @@
-import { TMessage } from '@imnull/messager'
-
 /* ### Chat room types ### */
 
 export type TRoomEnterCommand = {
@@ -67,10 +65,4 @@ export type TLiveRequestCommandAnswer = {
     answer: RTCSessionDescriptionInit
 }
 
-export type TExtraCommand<M extends { command: string }, C extends M['command']> = M extends { command: C } ? M : never
-// type TC = TExtraCommand<TRoomEnterCommand | TRoomEnterOKCommand, 'room-user-enter'>
-// type TC2 = TExtraCommand<TRoomEnterCommand | TRoomEnterOKCommand, 'room-user-enter-ok'>
 
-export type TMessageCommandNames<T extends { command: string }> = T extends { command: infer C } ? C : never
-export type TMessageCommandMap<T extends { command: string }, E extends TMessage = TMessage> = { [key in T['command']]: TExtraCommand<T, key> & E }
-export type TMessageCommandCallbackMap<T extends { command: string }, E extends TMessage = TMessage> = { [key in T['command']]?: (msg: TExtraCommand<T, key> & E) => void }

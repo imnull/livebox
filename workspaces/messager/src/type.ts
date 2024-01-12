@@ -1,6 +1,6 @@
 export type TMergeCommand<A extends TMessage, B extends TCommandExtra = null> = B extends null ? A : (A & B)
 
-export type TCommandExtra = { command: string } | null
+export type TCommandExtra = { command: string; _command_id?: any } | null
 
 export type TCommandMap<C extends TCommandExtra = null> = C extends { command: string } ? { [key in C['command']]: TExtraCommand<C, key> } : never
 
@@ -57,16 +57,27 @@ export type TMessagerConfig = {
 }
 
 
-export type TExtraCommand<M extends { command: string }, C extends M['command']> = M extends { command: C } ? M : never
+export type TExtraCommand<M extends TCommandExtra, C extends string> = M extends { command: C } ? M : null
 // type TC = TExtraCommand<TRoomEnterCommand | TRoomEnterOKCommand, 'room-user-enter'>
 // type TC2 = TExtraCommand<TRoomEnterCommand | TRoomEnterOKCommand, 'room-user-enter-ok'>
 
 // export type TMessageCommandNames<T extends { command: string }> = T extends { command: infer C } ? C : never
-export type TMessageCommandMap<T extends TCommandExtra, E extends TMessage = TMessage> = T extends { command: string } ? { [key in T['command']]: TExtraCommand<T, key> & E } : {}
-export type TMessageCommandCallbackMap<T extends TCommandExtra, E extends TMessage = TMessage> = T extends { command: string } ? { [key in T['command']]?: (msg: TExtraCommand<T, key> & E) => void } : {}
+export type TMessageCommandMap<C extends TCommandExtra, M extends TMessage = TMessage> = C extends { command: string } ? { [key in C['command']]: TMergeCommand<M, TExtraCommand<C, key>> } : {}
+export type TMessageCommandCallbackMap<C extends TCommandExtra, M extends TMessage = TMessage> = C extends { command: string } ? { [key in C['command']]?: (msg: TMergeCommand<M, TExtraCommand<C, key>>) => void } : {}
 
 // export type TMessageEventCallback<T extends TCommandExtra, E extends TMessage = TMessage, K extends keyof TMessageCommandMap<T, E> = never> = (command: K, callback: (msg: TMessageCommandMap<T, E>[K]) => void) => void
 
+export type TGenerator = <
+    G extends TMessagerConfig = TMessagerConfig,
+    C extends TCommandExtra = null,
+    T extends TMessager<C> = TMessager<C>
+>(C: new (config: G & TMessagerCoreConfig) => T, maker: TCoreMaker<G>) => (config: G) => T
+
+export type TGeneratorAsync = <
+    G extends TMessagerConfig = TMessagerConfig,
+    C extends TCommandExtra = null,
+    T extends TMessager<C> = TMessager<C>
+>(C: new (config: G & TMessagerCoreConfig) => T, maker: TCoreMakerAsync<G>) => (config: G) => Promise<T>
 
 
 // type TA = { type: 'a', a: 1 }
@@ -115,5 +126,19 @@ export type TMessageCommandCallbackMap<T extends TCommandExtra, E extends TMessa
 // cb('a', msg => {
 //     if(msg.command === 'a') {
 //         msg.
+//     }
+// })
+
+// type TA = { command: 'a', a: 0 }
+// type TB = { command: 'b', b: 1 }
+
+// const msg: TMessager<TA | TB>
+
+// msg.regist({
+//     'a': msg => {
+        
+//     },
+//     b: msg => {
+//         console.log(msg.b)
 //     }
 // })

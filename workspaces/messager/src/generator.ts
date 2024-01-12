@@ -1,17 +1,22 @@
-import { TCommandExtra, TCoreMaker, TCoreMakerAsync, TCoreMessager, TMessager, TMessagerConfig, TMessagerCoreConfig } from "./type"
+import {
+    TCommandExtra, TCoreMessager, TMessager, TMessagerConfig, TMessagerCoreConfig,
+    TGenerator, TGeneratorAsync,
+    
+} from "./type"
 
 import { Messager } from "./base"
 
 
-export const messagerGenerator = <G extends TMessagerConfig = TMessagerConfig, C extends TCommandExtra = null, T extends TMessager<C> = TMessager<C>>(C: new (config: G & TMessagerCoreConfig) => T, maker: TCoreMaker<G>) => {
-    return (config: G) => {
+export const messagerGenerator: TGenerator = (C, maker) => {
+    return (config) => {
         const core = maker(config)
         return new C({ ...config, core })
     }
 }
 
-export const messagerGeneratorAsync = <G extends TMessagerConfig = TMessagerConfig, C extends TCommandExtra = null, T extends TMessager<C> = TMessager<C>>(C: new (config: G & TMessagerCoreConfig) => T, maker: TCoreMakerAsync<G>) => {
-    return async (config: G) => {
+
+export const messagerGeneratorAsync: TGeneratorAsync = (C, maker) => {
+    return async (config) => {
         const core = await maker(config)
         return new C({ ...config, core })
     }

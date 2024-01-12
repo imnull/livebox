@@ -9,7 +9,7 @@ import { Room, RoomClient } from "./base-room"
 
 export const generator = (maker: TCoreMaker) => {
     return {
-        createMessager: <C extends TCommandExtra = never>(conf: TMessagerConfig) => {
+        createMessager: <C extends TCommandExtra = null>(conf: TMessagerConfig) => {
             return messagerGenerator(Messager<C>, maker)(conf)
         },
         createRoom: (conf: TMessagerConfig) => {
@@ -32,7 +32,7 @@ export const generator = (maker: TCoreMaker) => {
 
 export const generatorPromise = (maker: TCoreMakerAsync) => {
     return {
-        createMessager:  <C extends TCommandExtra = never>(conf: TMessagerConfig) => {
+        createMessager:  <C extends TCommandExtra = null>(conf: TMessagerConfig) => {
             return messagerGeneratorAsync(Messager<C>, maker)(conf)
         },
         createRoom: async (conf: TMessagerConfig) => {
