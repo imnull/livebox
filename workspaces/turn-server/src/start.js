@@ -1,17 +1,14 @@
-var Turn = require('node-turn');
-var server = new Turn({
+const Turn = require('node-turn')
+const config = require('./config.json')
+
+const server = new Turn({
     listeningPort: 3478,
-    listeningIps: [
-        '8.130.9.126',
-        '172.22.137.20',
-    ],
-    realm: 'turn.mkjs.net',
+    listeningIps: config.listeningIps,
+    realm: config.realm,
     // set options
-    authMech: 'long-term',
+    authMech: config.authMech,
     // authMech: 'none',
-    credentials: {
-        username: "password"
-    },
-    debugLevel: 'ALL',
+    credentials: config.credentials,
+    debugLevel: config.debugLevel,
 });
 server.start();
