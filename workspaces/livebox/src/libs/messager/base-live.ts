@@ -1,6 +1,6 @@
 import { Messager, TMessagerConfig, TMessagerCoreConfig } from "@imnull/messager"
 import { TLiveRequestCommandAnswer, TLiveRequestCommandCandidate, TLiveRequestCommandOffer } from "./type"
-import { iceServers } from "~/config"
+import CONFIG from "~/config"
 
 export class LiveRequest extends Messager<
     TLiveRequestCommandCandidate | TLiveRequestCommandOffer | TLiveRequestCommandAnswer
@@ -10,7 +10,7 @@ export class LiveRequest extends Messager<
 
     constructor(config: TMessagerConfig & TMessagerCoreConfig) {
         super(config)
-        this.peerConn = new RTCPeerConnection({ iceServers })
+        this.peerConn = new RTCPeerConnection({ iceServers: CONFIG.ICE_SERVERS })
         this.initRTCPeerConnection()
     }
 
@@ -76,7 +76,7 @@ export class LiveRequestClient extends Messager<
 
     constructor(config: TMessagerConfig & TMessagerCoreConfig) {
         super(config)
-        this.peerConn = new RTCPeerConnection({ iceServers })
+        this.peerConn = new RTCPeerConnection({ iceServers: CONFIG.ICE_SERVERS })
         this.initRTCPeerConnection()
     }
 
