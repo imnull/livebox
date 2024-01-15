@@ -7,6 +7,8 @@ export { default as StreamLocalCamera } from '~/components/stream-local-camera'
 export { default as StreamCanvasRandom } from '~/components/stream-canvas-random'
 export { default as StreamCaptureScreen } from '~/components/stream-capture-screen'
 
+export { default as QRCode } from '~/components/qrcode'
+
 export { MessageInput } from '~/components/chat-room/message-input'
 export { ChatArea } from '~/components/chat-room/chat-area'
 export { RoomUser } from '~/components/chat-room/room-user'

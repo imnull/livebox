@@ -243,6 +243,6 @@ export default (props: {
 
     return <div className={`stream-bus-container ${mini ? 'mini' : ''}`}>
         <canvas ref={setCanvas} width={1920} height={1080} />
-        <video style={{ width: 0, height: 0 }} ref={setVideo} />
+        <video style={{ width: 0, height: 0, opacity: 0, pointerEvents: 'none' }} ref={setVideo} />
     </div>
 }

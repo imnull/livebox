@@ -1,9 +1,11 @@
 .live-player-container {
-    width: 960px;
-    height: 540px;
+    width: 100%;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
     .live-player {
-        width: 960px;
-        height: 540px;
+        width: 100%;
     }
 }

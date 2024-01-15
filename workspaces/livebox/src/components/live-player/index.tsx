@@ -53,6 +53,6 @@ export default (props: {
     }
 
     return <div className="live-player-container">
-        <video className="live-player" muted ref={setVideo} autoPlay />
+        <video className="live-player" muted ref={setVideo} style={{ width: window.innerWidth }} autoPlay />
     </div>
 }

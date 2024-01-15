@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { StreamCanvasRandom, StreamLocalCamera, StreamCaptureScreen, StreamBus } from '~/components'
-import { LiveMain } from '~/components'
+import { LiveMain, QRCode } from '~/components'
 import { Button } from 'antd'
 
 import './index.scss'
@@ -23,6 +23,11 @@ const cloneStream = (stream: MediaStream) => {
         ms.addTrack(track)
     })
     return ms
+}
+
+const makeHashUrl = (router: string, hash: boolean = true) => {
+    const uri = new URL(location.href)
+    return `${uri.protocol}//${uri.hostname}${uri.pathname}${hash ? '#' : ''}${router}`
 }
 
 export default () => {
@@ -71,6 +76,7 @@ export default () => {
             <div className='monitor'>
                 <LiveMain channel={CHANNEL01} stream={main} />
                 <NavLink target='_blank' to={`/live/${CHANNEL01}`}>Go Channel01</NavLink>
+                <QRCode value={makeHashUrl(`/live/${CHANNEL01}`)} />
             </div>
         </div>
     </div>
