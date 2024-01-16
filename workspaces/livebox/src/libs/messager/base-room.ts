@@ -31,10 +31,10 @@ export class Room extends Messager<TRoomCommand> {
                     this.users.push({ id: msg.sender, ...msg.data })
                     this.onUsersUpdate([...this.users])
                     this.send({ target: 'public', command: 'room-update-users', data: [...this.users] })
-                    this.send({ target: 'private', reciever: msg.sender, command: 'room-update-users', data: [...this.users] })
+                    this.send({ target: 'private', receiver: msg.sender, command: 'room-update-users', data: [...this.users] })
                 } else {
                 }
-                this.send({ target: 'private', reciever: msg.sender, command: 'room-update-messages', data: [...this.messages] })
+                this.send({ target: 'private', receiver: msg.sender, command: 'room-update-messages', data: [...this.messages] })
             },
             'room-user-leave': msg => {
                 const idx = this.users.findIndex(u => u.id === msg.sender)
@@ -62,7 +62,7 @@ export class Room extends Messager<TRoomCommand> {
     livePlay(client: string) {
         this.send({
             target: 'private',
-            reciever: client,
+            receiver: client,
             command: 'room-live-play'
         })
     }

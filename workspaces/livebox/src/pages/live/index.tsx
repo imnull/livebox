@@ -8,7 +8,6 @@ export default (props: {}) => {
 
     const { channel } = useParams()
     return <div className="live-room">
-        <h1>LiveRoom: {channel}</h1>
-        <LivePlayer channel={channel} />
+        {channel ? <LivePlayer channel={channel} /> : null}
     </div>
 }

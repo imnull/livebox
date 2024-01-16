@@ -4,6 +4,7 @@ import Room from '~/pages/room';
 import RoomClient from '~/pages/room-client';
 import LiveList from '~/pages/live-list';
 import Live from '~/pages/live';
+import LiveClient from '~/pages/live-client';
 
 export default [
     { path: '/', text: 'Home', element: <Home /> },
@@ -14,4 +15,5 @@ export default [
     // { path: '/room-client/:name', element: <RoomClient /> },
     { path: '/live-list', text: 'LiveList', element: <LiveList /> },
     { path: '/live/:channel', element: <Live /> },
+    { path: '/live-client/:channel', element: <LiveClient /> },
 ];

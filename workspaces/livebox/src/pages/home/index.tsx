@@ -1,21 +1,22 @@
-import { useEffect } from 'react'
-import { BroadcastChannel } from '~/libs/messager'
+import { useEffect, useState } from 'react'
+import { NavLink } from 'react-router-dom'
+
+import { RtcClient, RtcServer } from '~/components'
 
 export default () => {
 
-    useEffect(() => {
-        BroadcastChannel.createMessager({ namespace: 'webrtc1' }).then(msg => {
-            msg.regist({
-                hello: msg => {
-                    console.log(11111, msg)
-                }
-            })
-            msg.send({
-                target: 'public',
-                command: 'hello'
-            })
-        })
-    }, [])
+    const [stream, setStream] = useState<MediaStream | null>(null)
+    const [remoteVideo, setRemoteVideo] = useState<HTMLVideoElement | null>(null)
 
-    return <h1>Home</h1>
+    const channel = 'channel-test'
+   
+
+    return <>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <h1>HOME</h1>
+            <NavLink style={{ marginLeft: 10 }} target='_blank' to={`/live-client/${channel}`}>Go live-client</NavLink>
+        </div>
+        <RtcServer channel={channel} url="https://webrtc.github.io/samples/src/video/chrome.mp4"></RtcServer>
+        {/* <RtcClient channel={channel} /> */}
+    </>
 }

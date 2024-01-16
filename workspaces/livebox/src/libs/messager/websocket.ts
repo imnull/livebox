@@ -2,6 +2,7 @@ import { TMessagerConfig, TCoreMessager, genId } from "@imnull/messager"
 import { generatorPromise } from "./generator"
 
 const createCore = (signaling: WebSocket, namespace: string): TCoreMessager => {
+    const identity = genId()
     return {
         useCallback(cb) {
             signaling.onmessage = async e => {
@@ -25,6 +26,7 @@ const createCore = (signaling: WebSocket, namespace: string): TCoreMessager => {
         close() {
             signaling.close()
         },
+        identity,
     }
 }
 

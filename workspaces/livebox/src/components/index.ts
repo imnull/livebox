@@ -15,3 +15,7 @@ export { RoomUser } from '~/components/chat-room/room-user'
 export { ChatContent } from '~/components/chat-room/chat-content'
 export { ChatMessage } from '~/components/chat-room/message'
 export { findUser } from '~/components/chat-room/utils'
+
+
+export { default as RtcClient }  from '~/components/rtc-client'
+export { default as RtcServer }  from '~/components/rtc-server'
