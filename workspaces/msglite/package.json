@@ -1,0 +1,19 @@
+{
+  "name": "@imnull/msglite",
+  "version": "1.3.0",
+  "description": "",
+  "main": "dist/index.js",
+  "module": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc src/index.ts --outDir dist -d --module commonjs --target es5"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "typescript": "^5.3.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
