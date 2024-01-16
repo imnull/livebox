@@ -17,7 +17,7 @@ const tryParseJSON = (val: any) => {
 }
 
 wss.on('connection', ws => {
-    console.log('Connected:', ws.url);
+    console.log('Add one connection:', ws.url);
     ws.on('message', msg => {
         const txt = msg.toString('utf-8')
         const data = tryParseJSON(txt)
@@ -25,15 +25,14 @@ wss.on('connection', ws => {
             return
         }
         // console.log(111111, data)
-        const { command, namespace } = data
+        const { command, namespace, socketid } = data
         if(!namespace) {
             return
         }
         if(command === 'websocket-regist') {
-            const msg = createMessager({ namespace, ws })
+            const msg = createMessager({ namespace, ws, socketid })
             cluster.regist(msg)
             ws.send(JSON.stringify({ namespace, command: 'websocket-regist-ok' }))
-
         } else {
             cluster.emit(data)
         }
