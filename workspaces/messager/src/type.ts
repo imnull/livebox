@@ -24,7 +24,7 @@ export type TMessage = ({
     group: string
 } | {
     target: 'private'
-    reciever: string
+    receiver: string
 })
 
 export type TCommandHello = {
@@ -40,6 +40,7 @@ export type TCoreMessager = {
     poseMessage: (data: any, sender: string) => void
     close: (sender: string) => void
     onReady?: <C extends TCommandExtra = null>(messager: TMessager<C>) => void
+    identity?: string
 }
 
 export type TCoreMaker<T extends TMessagerConfig = TMessagerConfig> = (config: T) => TCoreMessager

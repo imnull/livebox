@@ -22,7 +22,7 @@ export class Messager<C extends TCommandExtra = null> implements TMessager<C> {
         const { core, namespace = '', groups = [], blocks = [] } = config
 
         this.core = core
-        this.identity = genId()
+        this.identity = core.identity || genId()
         this.namespace = namespace
         this.groups = [...groups]
         this.blocks = [...blocks]
@@ -34,7 +34,7 @@ export class Messager<C extends TCommandExtra = null> implements TMessager<C> {
     protected init() {
         this.core.useCallback(data => {
             this.triggerEvent(data)
-        }, this.identity)
+        }, this.getIdentity())
         if(typeof this.core.onReady === 'function') {
             this.core.onReady(this)
         }
@@ -51,7 +51,7 @@ export class Messager<C extends TCommandExtra = null> implements TMessager<C> {
             case 'group':
                 return this.groups.includes(message.group)
             case 'private':
-                return this.getIdentity() === message.reciever
+                return this.getIdentity() === message.receiver
         }
         return false
     }
@@ -69,7 +69,7 @@ export class Messager<C extends TCommandExtra = null> implements TMessager<C> {
         this.events.triggerEvent(message.command, message)
     }
 
-    private buildInnerMessage(msg: TMergeCommand<TMessage, C>) {
+    protected buildInnerMessage(msg: TMergeCommand<TMessage, C>) {
         return { ...msg, sender: this.getIdentity() } as TMergeCommand<TMessageInner, C>
     }
 
@@ -107,11 +107,11 @@ export class Messager<C extends TCommandExtra = null> implements TMessager<C> {
 
     send(message: TMergeCommand<TMessage, C>) {
         const innerMessage = this.buildInnerMessage(message)
-        this.core.poseMessage(innerMessage, this.identity)
+        this.core.poseMessage(innerMessage, this.getIdentity())
     }
 
     close() {
         this.events.dispose()
-        this.core.close(this.identity)
+        this.core.close(this.getIdentity())
     }
 }
